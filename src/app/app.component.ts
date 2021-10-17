@@ -27,7 +27,7 @@ const size = 10;
 })
 export class AppComponent implements OnInit, AfterViewInit {
     title = 'game-of-life';
-    world: boolean[] = [];
+    world: boolean[][] = [];
 
     @ViewChild('canvasElement')
     canvasElement: ElementRef<HTMLCanvasElement> | undefined;
@@ -60,28 +60,26 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     createWorld() {
-        this.world = new Array(cols * rows).fill(false);
+        this.world = new Array(cols).fill(new Array(rows));
     }
 
     onClick($event: MouseEvent) {
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
-        const cell =
-            Math.round(($event.x - rect.x) / size) +
-            Math.round(($event.y - rect.y) / size) * cols;
-        console.log($event.x, $event.y, cell, this.world);
-        this.world[cell] = !this.world[cell];
+        const col = Math.round(($event.x - rect.x) / size);
+        const row = Math.round(($event.y - rect.y) / size);
+        this.world[col][row] = !this.world[col][row];
         this.draw();
     }
 
     draw() {
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < rows; r++) {
-                if (this.world[c + r * cols]) {
+        for (let col = 0; col < cols; col++) {
+            for (let row = 0; row < rows; row++) {
+                if (this.world[col][row]) {
                     this.context!.fillStyle = '#FF0000';
                 } else {
                     this.context!.fillStyle = '#00FFF0';
                 }
-                this.context?.fillRect(c * 10, r * 10, size, size);
+                this.context?.fillRect(col * 10, row * 10, size, size);
             }
         }
     }
@@ -96,34 +94,35 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     load() {
-        this.world[40 + 15 * cols] = true;
-        this.world[39 + 15 * cols] = true;
-        this.world[38 + 16 * cols] = true;
-        this.world[37 + 17 * cols] = true;
-        this.world[37 + 18 * cols] = true;
-        this.world[37 + 19 * cols] = true;
-        this.world[38 + 20 * cols] = true;
-        this.world[39 + 21 * cols] = true;
-        this.world[40 + 21 * cols] = true;
+        this.world[40][15] = true;
+        this.world[39][15] = true;
+        this.world[38][16] = true;
+        this.world[37][17] = true;
+        this.world[37][18] = true;
+        this.world[37][19] = true;
+        this.world[38][20] = true;
+        this.world[39][21] = true;
+        this.world[40][21] = true;
         this.draw();
     }
 
     tick() {
-        let newWorld = [];
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < rows; r++) {
-                const nbs = this.nbCount(c, r);
-                if (nbs < 2) {
-                    newWorld[c + r * cols] = false;
+        let newWorld: boolean[][] = [];
+        for (let col = 0; col < cols; col++) {
+            newWorld[col] = [];
+            for (let row = 0; row < rows; row++) {
+                const neighbors = this.countNeighbors(col, row);
+                if (neighbors < 2) {
+                    newWorld[col][row] = false;
                 }
-                if (nbs == 2 || nbs == 3) {
-                    newWorld[c + r * cols] = this.world[c + r * cols];
+                if (neighbors == 2 || neighbors == 3) {
+                    newWorld[col][row] = this.world[col][row];
                 }
-                if (nbs > 3) {
-                    newWorld[c + r * cols] = false;
+                if (neighbors > 3) {
+                    newWorld[col][row] = false;
                 }
-                if (nbs === 3) {
-                    newWorld[c + r * cols] = true;
+                if (neighbors === 3) {
+                    newWorld[col][row] = true;
                 }
             }
         }
@@ -131,20 +130,20 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.draw();
     }
 
-    nbCount(c: number, r: number): number {
-        let nbs = 0;
+    countNeighbors(col: number, row: number): number {
+        let neighbors = 0;
 
-        if (c > 0 && this.world[c - 1 + r * cols]) nbs++;
-        if (c < cols - 1 && this.world[c + 1 + r * cols]) nbs++;
-        if (r < rows - 1 && this.world[c + (r + 1) * cols]) nbs++;
-        if (r > 0 && this.world[c + (r - 1) * cols]) nbs++;
+        if (col > 0 && this.world[col - 1][row]) neighbors++;
+        if (col < cols - 1 && this.world[col + 1][row]) neighbors++;
+        if (row < rows - 1 && this.world[col][row + 1]) neighbors++;
+        if (row > 0 && this.world[col][row - 1]) neighbors++;
 
-        if (c > 0 && r > 0 && this.world[c - 1 + (r - 1) * cols]) nbs++;
-        if (c > 0 && r < rows - 1 && this.world[c - 1 + (r + 1) * cols]) nbs++;
-        if (c < cols - 1 && r > 0 && this.world[c + 1 + (r - 1) * cols]) nbs++;
-        if (c < cols - 1 && r < rows - 1 && this.world[c + 1 + (r + 1) * cols])
-            nbs++;
+        if (col > 0 && row > 0 && this.world[col - 1][row - 1]) neighbors++;
+        if (col > 0 && row < rows - 1 && this.world[col - 1][row + 1]) neighbors++;
+        if (col < cols - 1 && row > 0 && this.world[col + 1][row - 1]) neighbors++;
+        if (col < cols - 1 && row < rows - 1 && this.world[col + 1][row + 1])
+            neighbors++;
 
-        return nbs;
+        return neighbors;
     }
 }
