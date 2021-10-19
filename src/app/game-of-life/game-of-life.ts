@@ -9,9 +9,9 @@ export type Type =
 export function* gameOfLife(
     cols: number,
     rows: number
-): Generator<boolean[][]> {
-    function createNextGeneration(): boolean[][] {
-        let newWorld: boolean[][] = [];
+): Generator<World> {
+    function createNextGeneration(): World {
+        let newWorld: World = [];
         for (let col = 0; col < cols; col++) {
             newWorld[col] = new Array(rows).fill(false);
             for (let row = 0; row < rows; row++) {
@@ -58,8 +58,15 @@ export function* gameOfLife(
     let world = createFirstGeneration();
 
     while (true) {
-        yield world;
-        world = createNextGeneration();
+        const command:any = yield world;
+        if (!command)
+          world = createNextGeneration();
+        else {
+          if (command.creator === 'cell')
+          {
+            createCell(world, command.col, command.row);
+          }
+        }
     }
 }
 
@@ -76,5 +83,6 @@ export function createSpaceShip(world: World, x: number, y: number) {
 }
 
 export function createCell(world: World, col: number, row: number) {
-    world[col][row] = !world[col][row];
+    // world[col][row] = !world[col][row];
+    world[col][row] = true;
 }

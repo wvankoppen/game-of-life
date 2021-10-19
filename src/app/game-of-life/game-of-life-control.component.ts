@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { Type } from '../game-of-life';
+import { Component } from '@angular/core';
+import { Type } from './game-of-life';
+import { GameOfLifeService } from './game-of-life.service';
 
 @Component({
     selector: 'app-game-of-life-control',
@@ -11,30 +12,28 @@ import { Type } from '../game-of-life';
                 {{ type }}
             </option>
         </select>`,
-    styleUrls: ['./game-of-life-control.component.css'],
 })
-export class GameOfLifeControlComponent  {
-    @Output() start = new EventEmitter();
-    @Output() stop = new EventEmitter();
-    @Output() next = new EventEmitter();
-
+export class GameOfLifeControlComponent {
     types: Type[] = ['cell', 'spaceship-light'];
-    type: Type = 'cell';
-
-    public interval: any;
-
-    get isStarted(): boolean {
-        return !!this.interval;
+    set type(value: Type) {
+        this.gameOfLifeService.creator = value;
     }
 
+    constructor(private gameOfLifeService: GameOfLifeService) {}
+
     start() {
-        this.interval = setInterval(() => this.nextGeneration(), 10);
+        this.gameOfLifeService.start();
     }
 
     stop() {
-        clearInterval(this.interval);
-        this.interval = null;
+        this.gameOfLifeService.stop();
     }
 
-    nextGeneration() {}
+    get isStarted(): boolean {
+        return this.gameOfLifeService.isStarted;
+    }
+
+    nextGeneration() {
+      this.gameOfLifeService.nextGeneration();
+    }
 }

@@ -6,18 +6,18 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { World } from '../game-of-life';
-import { GameOfLifeStore } from './game-of-life.store';
+import { Observable } from 'rxjs'
+import { World } from './game-of-life';
+import { GameOfLifeService } from './game-of-life.service'
 
 const size = 10;
 
 @Component({
     selector: 'app-game-of-life-world',
     template: `
-        <canvas
-            [style.width.px]="width"
-            [style.height.px]="height"
+        <canvas *ngIf="world$ | async | golBox as box"
+            [style.width.px]="box.width"
+            [style.height.px]="box.height"
             (click)="onClick($event)"
             #canvasElement
         ></canvas>
@@ -31,7 +31,11 @@ export class GameOfLifeWorldComponent implements AfterViewInit {
 
     context: CanvasRenderingContext2D | null | undefined;
 
-    constructor(private gameOfLifeStore: GameOfLifeStore) {}
+    constructor(private gameOfLifeService: GameOfLifeService) {
+      this.world$ = gameOfLifeService.world$;
+    }
+
+    world$: Observable<World>;
 
     draw(world: World) {
         this.canvasElement!.nativeElement.width = world.length * size;
@@ -51,20 +55,9 @@ export class GameOfLifeWorldComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.gameOfLifeStore.world$.subscribe((s) => this.draw(s.world!));
+        this.world$.subscribe((w) => this.draw(w));
     }
 
-    get width() {
-        return this.gameOfLifeStore.world$.pipe(
-            map((s) => s.world!.length * size)
-        );
-    }
-
-    get height() {
-        return this.gameOfLifeStore.world$.pipe(
-            map((s) => s.world![0].length * size)
-        );
-    }
 
     onClick($event: MouseEvent) {
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();

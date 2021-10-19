@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { GameOfLifeService } from './game-of-life.service';
 
 const cols = 80;
 const rows = 60;
@@ -11,14 +12,9 @@ const rows = 60;
         ></app-game-of-life-world>`,
 })
 export class GameOfLifeComponent {
+    constructor(private gameOfLifeService: GameOfLifeService) {}
+
     onGolClick($event: any) {
-        // if (this.type === 'cell') {
-        //     createCell(this.world, $event.col, $event.row);
-        // }
-        // if (this.type === 'spaceship-light') {
-        //     createSpaceShip(this.world, $event.col, $event.row);
-        // }
-        //
-        // this.draw();
+        this.gameOfLifeService.create($event.col, $event.row);
     }
 }

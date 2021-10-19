@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { GameOfLifeWorldComponent } from './game-of-life-world.component'
 
-import { GameOfLifeWorldComponent } from './game-of-life.component';
 
-describe('GameOfLifeComponent', () => {
+describe('GameOfLifeWorldComponent', () => {
     let component: GameOfLifeWorldComponent;
     let fixture: ComponentFixture<GameOfLifeWorldComponent>;
 
