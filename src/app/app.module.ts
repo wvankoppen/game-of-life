@@ -4,11 +4,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveComponentModule } from '@ngrx/component'
 
 import { AppComponent } from './app.component';
-import { GameOfLifeComponent } from './game-of-life/game-of-life.component';
+import { GameOfLifeModule } from './game-of-life/game-of-life.module'
 
 @NgModule({
-    declarations: [AppComponent, GameOfLifeComponent],
-    imports: [BrowserModule, FormsModule,ReactiveComponentModule],
+    declarations: [AppComponent],
+    imports: [BrowserModule, FormsModule,ReactiveComponentModule, GameOfLifeModule],
     providers: [],
     bootstrap: [AppComponent],
 })
