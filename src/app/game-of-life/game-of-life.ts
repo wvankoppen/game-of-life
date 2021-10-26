@@ -6,10 +6,7 @@ export type Type =
     | 'spaceship-middle'
     | 'spaceship-heavy';
 
-export function* gameOfLife(
-    cols: number,
-    rows: number
-): Generator<World> {
+export function* gameOfLife(cols: number, rows: number): Generator<World> {
     function createNextGeneration(): World {
         let newWorld: World = [];
         for (let col = 0; col < cols; col++) {
@@ -49,23 +46,24 @@ export function* gameOfLife(
 
         return neighbors;
     }
-    function createFirstGeneration(): World {
+    function createFirstGeneration(cols: number, rows: number): World {
         return new Array(cols)
             .fill(null)
             .map((_) => new Array(rows).fill(false));
     }
 
-    let world = createFirstGeneration();
+    let world: World = createFirstGeneration(cols, rows);
 
     while (true) {
-        const command:any = yield world;
-        if (!command)
-          world = createNextGeneration();
+        const command: any = yield world;
+        if (!command) world = createNextGeneration();
         else {
-          if (command.creator === 'cell')
-          {
-            createCell(world, command.col, command.row);
-          }
+            if (command.creator === 'cell') {
+                toggleCell(world, command.col, command.row);
+            }
+            if (command.creator === 'spaceship-light') {
+                createSpaceShip(world, command.col, command.row);
+            }
         }
     }
 }
@@ -82,7 +80,6 @@ export function createSpaceShip(world: World, x: number, y: number) {
     world[x + 2][y + 3] = true;
 }
 
-export function createCell(world: World, col: number, row: number) {
-    // world[col][row] = !world[col][row];
-    world[col][row] = true;
+export function toggleCell(world: World, col: number, row: number) {
+    world[col][row] = !world[col][row];
 }

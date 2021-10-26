@@ -1,16 +1,25 @@
 import { Injectable } from '@angular/core';
-import { EMPTY, Observable, of, Subject, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { merge, Observable, Subject, timer } from 'rxjs';
+import { filter, map, mapTo, share } from 'rxjs/operators';
 import { gameOfLife, Type, World } from './game-of-life';
 
 @Injectable({ providedIn: 'root' })
 export class GameOfLifeService {
-    public trigger = new Subject();
-    public gol: Generator<World> = gameOfLife(100, 100);
+    public manualTrigger = new Subject();
+    public autoTrigger = timer(0, 200).pipe(
+        filter(() => this.isStarted),
+        mapTo(null)
+    );
+    public gol?: Generator<World>;
     public creator: Type = 'cell';
 
-    public world$: Observable<World> = this.trigger.pipe(
-        map((comm) => this.gol.next(comm).value)
+    public world$: Observable<World> = merge(
+        this.manualTrigger,
+        this.autoTrigger
+    ).pipe(
+        map((command) => this.gol.next(command).value),
+        share(),
+        filter((x) => !!x)
     );
 
     public get isStarted() {
@@ -21,19 +30,21 @@ export class GameOfLifeService {
 
     start() {
         this._isStarted = true;
-        this.trigger.next(timer(0, 100));
     }
 
     stop() {
         this._isStarted = false;
-        this.trigger.next(EMPTY);
     }
 
-    create(col: number, row: number) {
-        this.trigger.next({ col, row, creator: this.creator });
+    createFigure(col: number, row: number) {
+        this.manualTrigger.next({ col, row, creator: this.creator });
     }
 
     nextGeneration() {
-        this.trigger.next(of());
+        this.manualTrigger.next();
+    }
+
+    create(col: number, row: number) {
+        this.manualTrigger.next({ col, row, creator: 'w' });
     }
 }

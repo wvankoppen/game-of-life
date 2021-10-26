@@ -4,7 +4,7 @@ import { GameOfLifeService } from './game-of-life.service';
 
 @Component({
     selector: 'app-game-of-life-control',
-    template: ` <button (click)="nextGeneration()">Tick</button>
+    template: ` <button (click)="create()">Create</button><button (click)="nextGeneration()">Tick</button>
         <button (click)="start()" [disabled]="isStarted">Start</button>
         <button (click)="stop()" [disabled]="!isStarted">Stop</button>
         <select [(ngModel)]="type">
@@ -15,7 +15,10 @@ import { GameOfLifeService } from './game-of-life.service';
 })
 export class GameOfLifeControlComponent {
     types: Type[] = ['cell', 'spaceship-light'];
-    set type(value: Type) {
+    get type() {
+        return this.gameOfLifeService.creator;
+    }
+ set type(value: Type) {
         this.gameOfLifeService.creator = value;
     }
 
@@ -34,6 +37,9 @@ export class GameOfLifeControlComponent {
     }
 
     nextGeneration() {
-      this.gameOfLifeService.nextGeneration();
+        this.gameOfLifeService.nextGeneration();
+    }
+    create() {
+        this.gameOfLifeService.create(100,80);
     }
 }

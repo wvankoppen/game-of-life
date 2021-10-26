@@ -6,36 +6,38 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { Observable } from 'rxjs'
+import { Observable } from 'rxjs';
 import { World } from './game-of-life';
-import { GameOfLifeService } from './game-of-life.service'
+import { GameOfLifeService } from './game-of-life.service';
 
 const size = 10;
 
 @Component({
     selector: 'app-game-of-life-world',
     template: `
-        <canvas *ngIf="world$ | async | golBox as box"
+        <canvas
+            *ngIf="world$ | async | golBox as box"
             [style.width.px]="box.width"
             [style.height.px]="box.height"
             (click)="onClick($event)"
             #canvasElement
         ></canvas>
-    `
+    `,
 })
 export class GameOfLifeWorldComponent implements AfterViewInit {
-    @ViewChild('canvasElement')
-    canvasElement: ElementRef<HTMLCanvasElement> | undefined;
+    @ViewChild('canvasElement') canvasElement:
+        | ElementRef<HTMLCanvasElement>
+        | undefined;
 
     @Output() golClick = new EventEmitter();
 
     context: CanvasRenderingContext2D | null | undefined;
 
-    constructor(private gameOfLifeService: GameOfLifeService) {
-      this.world$ = gameOfLifeService.world$;
-    }
-
     world$: Observable<World>;
+
+    constructor(gameOfLifeService: GameOfLifeService) {
+        this.world$ = gameOfLifeService.world$;
+    }
 
     draw(world: World) {
         this.canvasElement!.nativeElement.width = world.length * size;
@@ -47,7 +49,7 @@ export class GameOfLifeWorldComponent implements AfterViewInit {
                 if (world[col][row]) {
                     this.context!.fillStyle = '#FF0000';
                 } else {
-                    this.context!.fillStyle = '#00FFF0';
+                    this.context!.fillStyle = '#00FF00';
                 }
                 this.context?.fillRect(col * 10, row * 10, size, size);
             }
@@ -57,7 +59,6 @@ export class GameOfLifeWorldComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.world$.subscribe((w) => this.draw(w));
     }
-
 
     onClick($event: MouseEvent) {
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
