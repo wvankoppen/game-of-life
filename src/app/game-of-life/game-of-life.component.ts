@@ -6,11 +6,10 @@ import {
     ViewChild,
 } from '@angular/core';
 import {
-    createSpaceShip,
-    toggleCell,
     GolFigure,
     World,
     createNextGeneration,
+    createFigure,
 } from './game-of-life';
 
 @Component({
@@ -20,10 +19,11 @@ import {
             <button (click)="tick()">Tick</button>
             <button (click)="start()" [disabled]="isStarted">Start</button>
             <button (click)="stop()" [disabled]="!isStarted">Stop</button>
-            <input type="text" size="3" [(ngModel)]="size" />
-            <select [(ngModel)]="drawType">
-                <option *ngFor="let type of drawTypes" [value]="type">
-                    {{ type }}
+            Size: <input type="text" size="3" [(ngModel)]="size" /> Delay:
+            <input type="text" size="3" [(ngModel)]="delay" />
+            <select [(ngModel)]="golFigure">
+                <option *ngFor="let figure of golFigures" [value]="figure">
+                    {{ figure }}
                 </option>
             </select>
         </div>
@@ -57,10 +57,11 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     context: CanvasRenderingContext2D | null | undefined;
     world!: World;
     size: number = 10;
+    delay: number = 10;
     private interval: any;
 
-    drawType: GolFigure = 'spaceship-light';
-    drawTypes: GolFigure[] = ['cell', 'spaceship-light'];
+    golFigure: GolFigure = 'spaceship-light';
+    golFigures: GolFigure[] = ['cell', 'semi-circle', 'spaceship-light'];
 
     get cols(): number {
         return this.world.length;
@@ -102,12 +103,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         const col = Math.round(($event.x - rect.x) / this.size);
         const row = Math.round(($event.y - rect.y) / this.size);
 
-        if (this.drawType === 'cell') {
-            toggleCell(this.world, col, row);
-        }
-        if (this.drawType === 'spaceship-light') {
-            createSpaceShip(this.world, col, row);
-        }
+        createFigure(this.golFigure, this.world, { col, row });
 
         this.draw();
     }
@@ -131,7 +127,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     }
 
     start() {
-        this.interval = setInterval(() => this.tick(), 100);
+        this.interval = setInterval(() => this.tick(), this.delay);
     }
 
     stop() {
