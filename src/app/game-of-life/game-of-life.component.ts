@@ -12,6 +12,9 @@ import {
     createFigure,
 } from './game-of-life';
 
+const aliveColor = '#fce114';
+const deadColor = '#a9a89f';
+
 @Component({
     selector: 'app-game-of-life',
     template: ` <div class="game-of-life__control">
@@ -32,7 +35,6 @@ import {
         `
             :host {
                 display: block;
-                background: red;
                 height: 100%;
             }
             canvas {
@@ -112,9 +114,9 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         for (let col = 0; col < this.cols; col++) {
             for (let row = 0; row < this.rows; row++) {
                 if (this.world[col][row]) {
-                    this.context!.fillStyle = '#FF0000';
+                    this.context!.fillStyle = aliveColor;
                 } else {
-                    this.context!.fillStyle = '#00FFF0';
+                    this.context!.fillStyle = deadColor;
                 }
                 this.context?.fillRect(
                     col * this.size,
