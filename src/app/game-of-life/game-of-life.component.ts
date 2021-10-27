@@ -13,8 +13,6 @@ import {
     createNextGeneration,
 } from './game-of-life';
 
-const size = 10;
-
 @Component({
     selector: 'app-game-of-life',
     template: ` <div class="game-of-life__control">
@@ -22,6 +20,7 @@ const size = 10;
             <button (click)="tick()">Tick</button>
             <button (click)="start()" [disabled]="isStarted">Start</button>
             <button (click)="stop()" [disabled]="!isStarted">Stop</button>
+            <input type="text" size="3" [(ngModel)]="size" />
             <select [(ngModel)]="drawType">
                 <option *ngFor="let type of drawTypes" [value]="type">
                     {{ type }}
@@ -57,10 +56,11 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
 
     context: CanvasRenderingContext2D | null | undefined;
     world!: World;
+    size: number = 10;
     private interval: any;
 
-    public drawType: GolFigure = 'cell';
-    public drawTypes: GolFigure[] = ['cell', 'spaceship-light'];
+    drawType: GolFigure = 'spaceship-light';
+    drawTypes: GolFigure[] = ['cell', 'spaceship-light'];
 
     get cols(): number {
         return this.world.length;
@@ -84,8 +84,8 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     }
 
     createWorld() {
-        const cols = Math.ceil(window.innerWidth / size);
-        const rows = Math.ceil(window.innerHeight / size);
+        const cols = Math.ceil(window.innerWidth / this.size);
+        const rows = Math.ceil(window.innerHeight / this.size);
         this.world = new Array(cols)
             .fill(null)
             .map((_) => new Array(rows).fill(false));
@@ -99,8 +99,8 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
 
     onClick($event: MouseEvent) {
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
-        const col = Math.round(($event.x - rect.x) / size);
-        const row = Math.round(($event.y - rect.y) / size);
+        const col = Math.round(($event.x - rect.x) / this.size);
+        const row = Math.round(($event.y - rect.y) / this.size);
 
         if (this.drawType === 'cell') {
             toggleCell(this.world, col, row);
@@ -120,7 +120,12 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
                 } else {
                     this.context!.fillStyle = '#00FFF0';
                 }
-                this.context?.fillRect(col * 10, row * 10, size, size);
+                this.context?.fillRect(
+                    col * this.size,
+                    row * this.size,
+                    this.size,
+                    this.size
+                );
             }
         }
     }
