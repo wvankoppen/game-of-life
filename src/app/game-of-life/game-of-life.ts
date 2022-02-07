@@ -24,28 +24,28 @@ export function createFigure(
     }
 }
 
-export function createSemiCircle(world: World, location: Coordinate) {
-    world[location.col + 2][location.row - 3] = true;
-    world[location.col + 1][location.row - 3] = true;
-    world[location.col][location.row - 2] = true;
-    world[location.col - 1][location.row - 1] = true;
-    world[location.col - 1][location.row] = true;
-    world[location.col - 1][location.row + 1] = true;
-    world[location.col][location.row + 2] = true;
-    world[location.col + 1][location.row + 3] = true;
-    world[location.col + 2][location.row + 3] = true;
+export function createSemiCircle(world: World, loc: Coordinate) {
+    world[loc.col + 2][loc.row - 3] = true;
+    world[loc.col + 1][loc.row - 3] = true;
+    world[loc.col + 0][loc.row - 2] = true;
+    world[loc.col - 1][loc.row - 1] = true;
+    world[loc.col - 1][loc.row + 0] = true;
+    world[loc.col - 1][loc.row + 1] = true;
+    world[loc.col + 0][loc.row + 2] = true;
+    world[loc.col + 1][loc.row + 3] = true;
+    world[loc.col + 2][loc.row + 3] = true;
 }
 
 export function createSpaceShipLight(world: World, location: Coordinate) {
     world[location.col - 1][location.row + 1] = true;
-    world[location.col][location.row - 1] = true;
-    world[location.col][location.row + 1] = true;
-    world[location.col + 1][location.row] = true;
+    world[location.col + 0][location.row - 1] = true;
+    world[location.col + 0][location.row + 1] = true;
+    world[location.col + 1][location.row + 0] = true;
     world[location.col + 1][location.row + 1] = true;
 }
 
-export function toggleCell(world: World, center: Coordinate) {
-    world[center.col][center.row] = !world[center.col][center.row];
+export function toggleCell(world: World, cell: Coordinate) {
+    world[cell.col][cell.row] = !world[cell.col][cell.row];
 }
 
 export function createNextGeneration(world: World): World {
@@ -60,56 +60,42 @@ export function createNextGeneration(world: World): World {
             if (neighbors < 2) {
                 newWorld[col][row] = false;
             }
-            if (neighbors == 2 || neighbors == 3) {
+            if (neighbors === 2) {
                 newWorld[col][row] = world[col][row];
-            }
-            if (neighbors > 3) {
-                newWorld[col][row] = false;
             }
             if (neighbors === 3) {
                 newWorld[col][row] = true;
+            }
+            if (neighbors > 3) {
+                newWorld[col][row] = false;
             }
         }
     }
     return newWorld;
 }
 
-export function countNeighbors(world: World, location: Coordinate): number {
-    let neighbors = 0;
+function countNeighbors(world: World, loc: Coordinate): number {
+    let neighborCount = 0;
     const cols = world.length;
     const rows = world[0].length;
 
-    if (location.col > 0 && world[location.col - 1][location.row]) neighbors++;
-    if (location.col < cols - 1 && world[location.col + 1][location.row])
-        neighbors++;
-    if (location.row < rows - 1 && world[location.col][location.row + 1])
-        neighbors++;
-    if (location.row > 0 && world[location.col][location.row - 1]) neighbors++;
+    if (loc.col > 0 && world[loc.col - 1][loc.row]) neighborCount++;
+    if (loc.col < cols - 1 && world[loc.col + 1][loc.row]) neighborCount++;
+    if (loc.row < rows - 1 && world[loc.col][loc.row + 1]) neighborCount++;
+    if (loc.row > 0 && world[loc.col][loc.row - 1]) neighborCount++;
 
+    if (loc.col > 0 && loc.row > 0 && world[loc.col - 1][loc.row - 1])
+        neighborCount++;
+    if (loc.col > 0 && loc.row < rows - 1 && world[loc.col - 1][loc.row + 1])
+        neighborCount++;
+    if (loc.col < cols - 1 && loc.row > 0 && world[loc.col + 1][loc.row - 1])
+        neighborCount++;
     if (
-        location.col > 0 &&
-        location.row > 0 &&
-        world[location.col - 1][location.row - 1]
+        loc.col < cols - 1 &&
+        loc.row < rows - 1 &&
+        world[loc.col + 1][loc.row + 1]
     )
-        neighbors++;
-    if (
-        location.col > 0 &&
-        location.row < rows - 1 &&
-        world[location.col - 1][location.row + 1]
-    )
-        neighbors++;
-    if (
-        location.col < cols - 1 &&
-        location.row > 0 &&
-        world[location.col + 1][location.row - 1]
-    )
-        neighbors++;
-    if (
-        location.col < cols - 1 &&
-        location.row < rows - 1 &&
-        world[location.col + 1][location.row + 1]
-    )
-        neighbors++;
+        neighborCount++;
 
-    return neighbors;
+    return neighborCount;
 }
