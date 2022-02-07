@@ -19,7 +19,7 @@ const deadColor = '#a9a89f';
     selector: 'app-game-of-life',
     template: ` <div class="game-of-life__control">
             <button (click)="recreateWorld()">Recreate empty world</button>
-            <button (click)="tick()">Tick</button>
+            <button (click)="tick()" [disabled]="isStarted">Tick</button>
             <button (click)="start()" [disabled]="isStarted">Start</button>
             <button (click)="stop()" [disabled]="!isStarted">Stop</button>
             Size: <input type="text" size="3" [(ngModel)]="size" /> Delay:
