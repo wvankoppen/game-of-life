@@ -101,6 +101,5 @@
         }
       }
     }
-  },
-  "defaultProject": "game-of-life"
+  }
 }
