@@ -1,25 +1,19 @@
-export type World = boolean[][];
-export type GolFigure = 'cell' | 'semi-circle' | 'spaceship-light';
-
-export interface Coordinate {
-    col: number;
-    row: number;
-}
+import { Coordinate, Figure, World } from "./game-of-life.model";
 
 export function createFigure(
-    figure: GolFigure,
+    figure: Figure,
     world: World,
-    location: Coordinate
+    cell: Coordinate
 ) {
     switch (figure) {
         case 'cell':
-            toggleCell(world, location);
+            toggleCell(world, cell);
             break;
         case 'semi-circle':
-            createSemiCircle(world, location);
+            createSemiCircle(world, cell);
             break;
         case 'spaceship-light':
-            createSpaceShipLight(world, location);
+            createSpaceShipLight(world, cell);
             break;
     }
 }
@@ -74,26 +68,26 @@ export function createNextGeneration(world: World): World {
     return newWorld;
 }
 
-function countNeighbors(world: World, loc: Coordinate): number {
+function countNeighbors(world: World, cell: Coordinate): number {
     let neighborCount = 0;
     const cols = world.length;
     const rows = world[0].length;
 
-    if (loc.col > 0 && world[loc.col - 1][loc.row]) neighborCount++;
-    if (loc.col < cols - 1 && world[loc.col + 1][loc.row]) neighborCount++;
-    if (loc.row < rows - 1 && world[loc.col][loc.row + 1]) neighborCount++;
-    if (loc.row > 0 && world[loc.col][loc.row - 1]) neighborCount++;
+    if (cell.col > 0 && world[cell.col - 1][cell.row]) neighborCount++;
+    if (cell.col < cols - 1 && world[cell.col + 1][cell.row]) neighborCount++;
+    if (cell.row < rows - 1 && world[cell.col][cell.row + 1]) neighborCount++;
+    if (cell.row > 0 && world[cell.col][cell.row - 1]) neighborCount++;
 
-    if (loc.col > 0 && loc.row > 0 && world[loc.col - 1][loc.row - 1])
+    if (cell.col > 0 && cell.row > 0 && world[cell.col - 1][cell.row - 1])
         neighborCount++;
-    if (loc.col > 0 && loc.row < rows - 1 && world[loc.col - 1][loc.row + 1])
+    if (cell.col > 0 && cell.row < rows - 1 && world[cell.col - 1][cell.row + 1])
         neighborCount++;
-    if (loc.col < cols - 1 && loc.row > 0 && world[loc.col + 1][loc.row - 1])
+    if (cell.col < cols - 1 && cell.row > 0 && world[cell.col + 1][cell.row - 1])
         neighborCount++;
     if (
-        loc.col < cols - 1 &&
-        loc.row < rows - 1 &&
-        world[loc.col + 1][loc.row + 1]
+        cell.col < cols - 1 &&
+        cell.row < rows - 1 &&
+        world[cell.col + 1][cell.row + 1]
     )
         neighborCount++;
 

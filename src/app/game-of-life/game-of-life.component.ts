@@ -5,12 +5,8 @@ import {
     OnInit,
     ViewChild,
 } from '@angular/core';
-import {
-    GolFigure,
-    World,
-    createNextGeneration,
-    createFigure,
-} from './game-of-life';
+import { createNextGeneration, createFigure } from './game-of-life';
+import { Figure, World } from './game-of-life.model';
 
 const aliveColor = '#fce114';
 const deadColor = '#a9a89f';
@@ -24,8 +20,11 @@ const deadColor = '#a9a89f';
             <button (click)="stop()" [disabled]="!isStarted">Stop</button>
             Size: <input type="text" size="3" [(ngModel)]="size" /> Delay:
             <input type="text" size="3" [(ngModel)]="delay" />
-            <select [(ngModel)]="golFigure">
-                <option *ngFor="let figure of golFigures" [value]="figure">
+            <select [(ngModel)]="nextFigure">
+                <option
+                    *ngFor="let figure of availableFigures"
+                    [value]="figure"
+                >
                     {{ figure }}
                 </option>
             </select>
@@ -62,8 +61,8 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     delay: number = 10;
     private interval: any;
 
-    golFigure: GolFigure = 'spaceship-light';
-    golFigures: GolFigure[] = ['cell', 'semi-circle', 'spaceship-light'];
+    nextFigure: Figure = 'spaceship-light';
+    availableFigures: Figure[] = ['cell', 'semi-circle', 'spaceship-light'];
 
     get cols(): number {
         return this.world.length;
@@ -105,7 +104,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         const col = Math.round(($event.x - rect.x) / this.size);
         const row = Math.round(($event.y - rect.y) / this.size);
 
-        createFigure(this.golFigure, this.world, { col, row });
+        createFigure(this.nextFigure, this.world, { col, row });
 
         this.draw();
     }
@@ -113,11 +112,9 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     draw() {
         for (let col = 0; col < this.cols; col++) {
             for (let row = 0; row < this.rows; row++) {
-                if (this.world[col][row]) {
-                    this.context!.fillStyle = aliveColor;
-                } else {
-                    this.context!.fillStyle = deadColor;
-                }
+                this.context!.fillStyle = this.world[col][row]
+                    ? aliveColor
+                    : deadColor;
                 this.context?.fillRect(
                     col * this.size,
                     row * this.size,
