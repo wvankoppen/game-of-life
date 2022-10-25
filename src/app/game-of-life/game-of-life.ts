@@ -24,16 +24,16 @@ export function createFigure(
     }
 }
 
-export function createSemiCircle(world: World, loc: Coordinate) {
-    world[loc.col + 2][loc.row - 3] = true;
-    world[loc.col + 1][loc.row - 3] = true;
-    world[loc.col + 0][loc.row - 2] = true;
-    world[loc.col - 1][loc.row - 1] = true;
-    world[loc.col - 1][loc.row + 0] = true;
-    world[loc.col - 1][loc.row + 1] = true;
-    world[loc.col + 0][loc.row + 2] = true;
-    world[loc.col + 1][loc.row + 3] = true;
-    world[loc.col + 2][loc.row + 3] = true;
+export function createSemiCircle(world: World, cell: Coordinate) {
+    world[cell.col + 2][cell.row - 3] = true;
+    world[cell.col + 1][cell.row - 3] = true;
+    world[cell.col + 0][cell.row - 2] = true;
+    world[cell.col - 1][cell.row - 1] = true;
+    world[cell.col - 1][cell.row + 0] = true;
+    world[cell.col - 1][cell.row + 1] = true;
+    world[cell.col + 0][cell.row + 2] = true;
+    world[cell.col + 1][cell.row + 3] = true;
+    world[cell.col + 2][cell.row + 3] = true;
 }
 
 export function createSpaceShipLight(world: World, location: Coordinate) {
