@@ -1,10 +1,6 @@
-import { Coordinate, Figure, World } from "./game-of-life.model";
+import { Coordinate, Figure, World } from './game-of-life.model';
 
-export function createFigure(
-    figure: Figure,
-    world: World,
-    cell: Coordinate
-) {
+export function createFigure(figure: Figure, world: World, cell: Coordinate) {
     switch (figure) {
         case 'cell':
             toggleCell(world, cell);
@@ -40,6 +36,10 @@ export function createSpaceShipLight(world: World, location: Coordinate) {
 
 export function toggleCell(world: World, cell: Coordinate) {
     world[cell.col][cell.row] = !world[cell.col][cell.row];
+}
+
+export function createWorld(cols: number, rows: number) {
+    return new Array(cols).fill(null).map((_) => new Array(rows).fill(false));
 }
 
 export function createNextGeneration(world: World): World {
@@ -80,9 +80,17 @@ function countNeighbors(world: World, cell: Coordinate): number {
 
     if (cell.col > 0 && cell.row > 0 && world[cell.col - 1][cell.row - 1])
         neighborCount++;
-    if (cell.col > 0 && cell.row < rows - 1 && world[cell.col - 1][cell.row + 1])
+    if (
+        cell.col > 0 &&
+        cell.row < rows - 1 &&
+        world[cell.col - 1][cell.row + 1]
+    )
         neighborCount++;
-    if (cell.col < cols - 1 && cell.row > 0 && world[cell.col + 1][cell.row - 1])
+    if (
+        cell.col < cols - 1 &&
+        cell.row > 0 &&
+        world[cell.col + 1][cell.row - 1]
+    )
         neighborCount++;
     if (
         cell.col < cols - 1 &&

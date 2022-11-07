@@ -5,7 +5,7 @@ import {
     OnInit,
     ViewChild,
 } from '@angular/core';
-import { createNextGeneration, createFigure } from './game-of-life';
+import { createNextGeneration, createFigure, createWorld } from './game-of-life';
 import { Figure, World } from './game-of-life.model';
 
 const aliveColor = '#fce114';
@@ -88,9 +88,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     createWorld() {
         const cols = Math.ceil(window.innerWidth / this.size);
         const rows = Math.ceil(window.innerHeight / this.size);
-        this.world = new Array(cols)
-            .fill(null)
-            .map((_) => new Array(rows).fill(false));
+        this.world = createWorld(cols, rows);
     }
 
     recreateWorld() {
