@@ -3,5 +3,35 @@ export interface Coordinate {
   row: number;
 }
 
-export type World = boolean[][];
-export type Figure = 'cell' | 'semi-circle' | 'spaceship-light';
+export const cell = `X`;
+export const glider = `
+-X-
+--X
+XXX
+`;
+
+export const block = `
+XX
+XX`;
+
+export const pulsar = `
+--XXX---XXX--
+--------------
+X----X X----X
+X----X X----X
+X----X X----X
+--XXX---XXX--
+-------------
+--XXX---XXX--
+X----X X----X
+X----X X----X
+X----X X----X
+--------------
+--XXX---XXX--`;
+
+export const figures: { [key: string]: string } = {
+  cell,
+  glider,
+  block,
+  pulsar,
+};

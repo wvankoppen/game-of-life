@@ -5,8 +5,8 @@ import {
     OnInit,
     ViewChild,
 } from '@angular/core';
-import { createNextGeneration, createFigure, createWorld } from './game-of-life';
-import { Figure, World } from './game-of-life.model';
+import { World } from './game-of-life';
+import { figures } from "./game-of-life.model";
 
 const aliveColor = '#fce114';
 const deadColor = '#a9a89f';
@@ -61,16 +61,8 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     delay: number = 10;
     private interval: any;
 
-    nextFigure: Figure = 'spaceship-light';
-    availableFigures: Figure[] = ['cell', 'semi-circle', 'spaceship-light'];
-
-    get cols(): number {
-        return this.world.length;
-    }
-
-    get rows(): number {
-        return this.world[0].length;
-    }
+    availableFigures: string[] = Object.keys(figures);
+  nextFigure: string = this.availableFigures[0];
 
     get isStarted(): boolean {
         return !!this.interval;
@@ -88,7 +80,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     createWorld() {
         const cols = Math.ceil(window.innerWidth / this.size);
         const rows = Math.ceil(window.innerHeight / this.size);
-        this.world = createWorld(cols, rows);
+        this.world = new World(cols, rows);
     }
 
     recreateWorld() {
@@ -102,15 +94,18 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         const col = Math.round(($event.x - rect.x) / this.size);
         const row = Math.round(($event.y - rect.y) / this.size);
 
-        createFigure(this.nextFigure, this.world, { col, row });
+        this.world.add(figures[this.nextFigure], { col, row });
 
         this.draw();
     }
 
     draw() {
-        for (let col = 0; col < this.cols; col++) {
-            for (let row = 0; row < this.rows; row++) {
-                this.context!.fillStyle = this.world[col][row]
+        for (let col = 0; col < this.world.cols; col++) {
+            for (let row = 0; row < this.world.rows; row++) {
+                this.context!.fillStyle = this.world.isAlive({
+                    col,
+                    row,
+                })
                     ? aliveColor
                     : deadColor;
                 this.context?.fillRect(
@@ -133,7 +128,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     }
 
     tick() {
-        this.world = createNextGeneration(this.world);
+        this.world.tick();
         this.draw();
     }
 
