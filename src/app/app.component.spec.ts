@@ -1,16 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+import { MockBuilder, MockRender } from 'ng-mocks';
 import { AppComponent } from './app.component';
+import { AppModule } from './app.module';
 
 describe('AppComponent', () => {
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [AppComponent],
-        }).compileComponents();
+    let component: AppComponent;
+    beforeEach(() => MockBuilder(AppComponent, AppModule));
+
+    beforeEach(() => {
+        component = MockRender(AppComponent).point.componentInstance;
     });
 
-    it('should create the app', () => {
-        const fixture = TestBed.createComponent(AppComponent);
-        const app = fixture.componentInstance;
-        expect(app).toBeTruthy();
+    it('should create', () => {
+        expect(component).toBeTruthy();
     });
 });
