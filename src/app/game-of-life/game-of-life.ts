@@ -1,20 +1,19 @@
 import { Coordinate } from './game-of-life.model';
 
-
 export class World {
     private cells: boolean[][];
 
     constructor(cols: number, rows: number) {
-        this.cells = new Array(cols)
+        this.cells = new Array(rows)
             .fill(null)
-            .map((_) => new Array(rows).fill(false));
-    }
-
-    public get cols() {
-        return this.cells.length;
+            .map((_) => new Array(cols).fill(false));
     }
 
     public get rows() {
+        return this.cells.length;
+    }
+
+    public get cols() {
         return this.cells[0].length;
     }
 
@@ -26,50 +25,49 @@ export class World {
     }
 
     public toggle(cell: Coordinate) {
-        this.cells[cell.col][cell.row] = !this.cells[cell.col][cell.row];
+        this.cells[cell.row][cell.col] = !this.cells[cell.row][cell.col];
     }
 
-    public add(figure: string, center: Coordinate) {
-        const lines = figure.trim().split('\n');
-        const offsetCol = Math.round(lines[0].length / 2);
-        const offsetRow = Math.round(lines.length / 2);
-        for (let col = 0; col < lines.length; col++) {
-            for (let row = 0; row < lines[0].length; row++) {
+    public draw(figure: string, center: Coordinate) {
+        const rowData = figure.trim().split('\n');
+        const rows = rowData.length;
+        const cols = rowData[0].length;
+        const offsetCol = Math.round(cols / 2);
+        const offsetRow = Math.round(rows / 2);
+        for (let col = 0; col < cols; col++) {
+            for (let row = 0; row < rows; row++) {
                 const x = col + center.col - offsetCol;
                 const y = row + center.row - offsetRow;
                 if (
-                    this.cells[x] !== undefined &&
-                    this.cells[x][y] !== undefined
+                    this.cells[y] !== undefined &&
+                    this.cells[y][x] !== undefined
                 )
-                    this.cells[x][y] = lines[col][row] === 'X';
+                    this.cells[y][x] = rowData[row][col] === 'X';
             }
         }
     }
 
     public isAlive(cell: Coordinate): boolean {
-        return this.cells[cell.col][cell.row];
+        return this.cells[cell.row][cell.col];
     }
 
     public tick() {
-        const cols = this.cells.length;
-        const rows = this.cells[0].length;
-
         let newWorld: boolean[][] = [];
-        for (let col = 0; col < cols; col++) {
-            newWorld[col] = [];
-            for (let row = 0; row < rows; row++) {
+        for (let row = 0; row < this.rows; row++) {
+            newWorld[row] = [];
+            for (let col = 0; col < this.cols; col++) {
                 const neighbors = this.countNeighbors({ col, row });
                 if (neighbors < 2) {
-                    newWorld[col][row] = false;
+                    newWorld[row][col] = false;
                 }
                 if (neighbors === 2) {
-                    newWorld[col][row] = this.cells[col][row];
+                    newWorld[row][col] = this.cells[row][col];
                 }
                 if (neighbors === 3) {
-                    newWorld[col][row] = true;
+                    newWorld[row][col] = true;
                 }
                 if (neighbors > 3) {
-                    newWorld[col][row] = false;
+                    newWorld[row][col] = false;
                 }
             }
         }
@@ -78,38 +76,36 @@ export class World {
 
     public countNeighbors(cell: Coordinate): number {
         let neighborCount = 0;
-        const cols = this.cells.length;
-        const rows = this.cells[0].length;
 
-        if (cell.col > 0 && this.cells[cell.col - 1][cell.row]) neighborCount++;
-        if (cell.col < cols - 1 && this.cells[cell.col + 1][cell.row])
+        if (cell.row > 0 && this.cells[cell.row - 1][cell.col]) neighborCount++;
+        if (cell.row < this.rows - 1 && this.cells[cell.row + 1][cell.col])
             neighborCount++;
-        if (cell.row < rows - 1 && this.cells[cell.col][cell.row + 1])
+        if (cell.col < this.cols - 1 && this.cells[cell.row][cell.col + 1])
             neighborCount++;
-        if (cell.row > 0 && this.cells[cell.col][cell.row - 1]) neighborCount++;
+        if (cell.col > 0 && this.cells[cell.row][cell.col - 1]) neighborCount++;
 
         if (
-            cell.col > 0 &&
             cell.row > 0 &&
-            this.cells[cell.col - 1][cell.row - 1]
-        )
-            neighborCount++;
-        if (
             cell.col > 0 &&
-            cell.row < rows - 1 &&
-            this.cells[cell.col - 1][cell.row + 1]
+            this.cells[cell.row - 1][cell.col - 1]
         )
             neighborCount++;
         if (
-            cell.col < cols - 1 &&
             cell.row > 0 &&
-            this.cells[cell.col + 1][cell.row - 1]
+            cell.col < this.cols - 1 &&
+            this.cells[cell.row - 1][cell.col + 1]
         )
             neighborCount++;
         if (
-            cell.col < cols - 1 &&
-            cell.row < rows - 1 &&
-            this.cells[cell.col + 1][cell.row + 1]
+            cell.row < this.rows - 1 &&
+            cell.col > 0 &&
+            this.cells[cell.row + 1][cell.col - 1]
+        )
+            neighborCount++;
+        if (
+            cell.row < this.rows - 1 &&
+            cell.col < this.cols - 1 &&
+            this.cells[cell.row + 1][cell.col + 1]
         )
             neighborCount++;
 

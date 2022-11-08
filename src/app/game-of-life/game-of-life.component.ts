@@ -6,7 +6,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { World } from './game-of-life';
-import { figures } from "./game-of-life.model";
+import { figures } from './game-of-life.model';
 
 const aliveColor = '#fce114';
 const deadColor = '#a9a89f';
@@ -62,7 +62,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     private interval: any;
 
     availableFigures: string[] = Object.keys(figures);
-  nextFigure: string = this.availableFigures[0];
+    nextFigure: string = this.availableFigures[0];
 
     get isStarted(): boolean {
         return !!this.interval;
@@ -77,12 +77,6 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         this.draw();
     }
 
-    createWorld() {
-        const cols = Math.ceil(window.innerWidth / this.size);
-        const rows = Math.ceil(window.innerHeight / this.size);
-        this.world = new World(cols, rows);
-    }
-
     recreateWorld() {
         this.createWorld();
         this.initCanvas();
@@ -94,7 +88,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         const col = Math.round(($event.x - rect.x) / this.size);
         const row = Math.round(($event.y - rect.y) / this.size);
 
-        this.world.add(figures[this.nextFigure], { col, row });
+        this.world.draw(figures[this.nextFigure], { col, row });
 
         this.draw();
     }
@@ -130,6 +124,12 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     tick() {
         this.world.tick();
         this.draw();
+    }
+
+    private createWorld() {
+        const cols = Math.ceil(window.innerWidth / this.size);
+        const rows = Math.ceil(window.innerHeight / this.size);
+        this.world = new World(cols, rows);
     }
 
     private initCanvas() {
