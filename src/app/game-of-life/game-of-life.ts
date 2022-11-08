@@ -2,6 +2,7 @@ import { Coordinate } from './game-of-life.model';
 
 export class World {
     private cells: boolean[][];
+    private _iterations = 0;
 
     constructor(cols: number, rows: number) {
         this.cells = new Array(rows)
@@ -9,15 +10,19 @@ export class World {
             .map((_) => new Array(cols).fill(false));
     }
 
-    public get rows() {
+    public get iterations(): number {
+        return this._iterations;
+    }
+
+    public get rows(): number {
         return this.cells.length;
     }
 
-    public get cols() {
+    public get cols(): number {
         return this.cells[0].length;
     }
 
-    public get livingCellCount() {
+    public get livingCellCount(): number {
         return this.cells.reduce(
             (acc, cur) => cur.filter((c) => c).length + acc,
             0
@@ -72,6 +77,7 @@ export class World {
             }
         }
         this.cells = newWorld;
+        this._iterations++;
     }
 
     public countNeighbors(cell: Coordinate): number {
