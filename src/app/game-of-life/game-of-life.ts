@@ -22,6 +22,10 @@ export class World {
         return this.cells[0].length;
     }
 
+    public get hasLife(): boolean {
+        return this.livingCellCount > 0;
+    }
+
     public get livingCellCount(): number {
         return this.cells.reduce(
             (acc, cur) => cur.filter((c) => c).length + acc,

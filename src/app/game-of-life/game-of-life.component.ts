@@ -14,14 +14,14 @@ const deadColor = '#a9a89f';
 @Component({
     selector: 'app-game-of-life',
     template: ` <div class="game-of-life__control">
-            <button mat-button (click)="recreateWorld()">
-                Recreate empty world
+            <button mat-button *ngIf="world.hasLife" (click)="recreateWorld()">
+                Clear
             </button>
             <button
                 mat-button
                 (click)="tick()"
                 color="primary"
-                [disabled]="isStarted"
+                [disabled]="isStarted || !world.hasLife"
             >
                 Tick
             </button>
@@ -30,29 +30,31 @@ const deadColor = '#a9a89f';
             </button>
             <button mat-button (click)="stop()" *ngIf="isStarted">Stop</button>
 
-            Size:
+            Granularity:
             <mat-slider
-                min="10"
-                max="100"
+                [min]="sizeMin"
+                [max]="sizeMax"
                 step="1"
                 [(ngModel)]="size"
             ></mat-slider>
-            Delay:
+            Speed:
             <mat-slider
-                min="10"
-                max="100"
+                [min]="speedMin"
+                [max]="speedMax"
                 step="1"
-                [(ngModel)]="delay"
+                [(ngModel)]="speed"
             ></mat-slider>
             Iterations: {{ world.iterations }}
-            <select [(ngModel)]="nextFigure">
-                <option
-                    *ngFor="let figure of availableFigures"
-                    [value]="figure"
-                >
-                    {{ figure }}
-                </option>
-            </select>
+            <mat-form-field>
+                <mat-select [(ngModel)]="nextFigure">
+                    <mat-option
+                        *ngFor="let figure of availableFigures"
+                        [value]="figure"
+                    >
+                        <pre>{{ figure }}</pre>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
         </div>
         <canvas (click)="onClick($event)" #canvasElement></canvas>`,
     styles: [
@@ -66,7 +68,7 @@ const deadColor = '#a9a89f';
                 width: 100%;
                 height: 100%;
                 position: absolute;
-                background: #CCC;
+                background: #ccc;
                 top: 0;
                 left: 0;
                 z-index: 0;
@@ -84,10 +86,16 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
 
     context: CanvasRenderingContext2D | null | undefined;
     world!: World;
+
+    speedMin = 1;
+    speedMax = 100;
+    sizeMin = 5;
+    sizeMax = 10;
     private _size: number = 10;
-    private _delay: number = 10;
+    private _speed: number = this.speedMax / 2;
     private interval: any;
 
+    figures = figures;
     availableFigures: string[] = Object.keys(figures);
     nextFigure: string =
         this.availableFigures[this.availableFigures.length - 1];
@@ -96,12 +104,12 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         return !!this.interval;
     }
 
-    get delay(): number {
-        return this._delay;
+    get speed(): number {
+        return this._speed;
     }
 
-    set delay(value: number) {
-        this._delay = value;
+    set speed(value: number) {
+        this._speed = value;
         this.checkRestart();
     }
 
@@ -169,7 +177,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
     }
 
     start() {
-        this.interval = setInterval(() => this.tick(), this.delay);
+        this.interval = setInterval(() => this.tick(), 1000 / this.speed);
     }
 
     stop() {
