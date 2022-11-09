@@ -2,9 +2,13 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
+    NgZone,
     OnInit,
     ViewChild,
 } from '@angular/core';
+import { debounceTime, Observable, tap } from 'rxjs';
+import { runInZone } from '../util/run-in-zone';
+import { observeElementSize } from '../util/resize-observer';
 import { World } from './game-of-life';
 import { figures } from './game-of-life.model';
 
@@ -55,6 +59,8 @@ const deadColor = '#a9a89f';
                     </mat-option>
                 </mat-select>
             </mat-form-field>
+            {{ size$ | async | json }}
+            [{{ world.rows }},{{ world.cols }}],
         </div>
         <canvas (click)="onClick($event)" #canvasElement></canvas>`,
     styles: [
@@ -122,7 +128,18 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         this.resize();
     }
 
+    size$?: Observable<any>;
+
+    constructor(private host: ElementRef, private zone: NgZone) {}
+
     ngOnInit() {
+        this.size$ = observeElementSize(this.host.nativeElement).pipe(
+            debounceTime(100),
+            runInZone(this.zone),
+            tap((_x) => this.resize()),
+            tap(console.log)
+        );
+
         this.createWorld();
     }
 
@@ -143,7 +160,7 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         const col = Math.round(($event.x - rect.x) / this.size);
         const row = Math.round(($event.y - rect.y) / this.size);
 
-        this.world.draw(figures[this.nextFigure], { col, row });
+        this.world.add(figures[this.nextFigure], { col, row });
 
         this.draw();
     }
@@ -185,6 +202,11 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         this.interval = null;
     }
 
+    tick() {
+        this.world.tick();
+        this.draw();
+    }
+
     private checkRestart() {
         if (this.isStarted) {
             this.stop();
@@ -192,25 +214,29 @@ export class GameOfLifeComponent implements OnInit, AfterViewInit {
         }
     }
 
-    tick() {
-        this.world.tick();
-        this.draw();
+    private getDims() {
+        const cols = Math.ceil(window.innerWidth / this.size);
+        const rows = Math.ceil(window.innerHeight / this.size);
+        return { rows, cols };
     }
 
     private createWorld() {
-        const cols = Math.ceil(window.innerWidth / this.size);
-        const rows = Math.ceil(window.innerHeight / this.size);
+        const { cols, rows } = this.getDims();
         this.world = new World(cols, rows);
-    }
-
-    private resize() {
-        this.canvasElement!.nativeElement.width = window.innerWidth;
-        this.canvasElement!.nativeElement.height = window.innerHeight;
-        this.draw();
     }
 
     private initCanvas() {
         this.resize();
         this.context = this.canvasElement?.nativeElement.getContext('2d');
+        this.canvasElement!.nativeElement.width = window.innerWidth;
+        this.canvasElement!.nativeElement.height = window.innerHeight;
+    }
+
+    private resize() {
+        this.canvasElement!.nativeElement.width = window.innerWidth;
+        this.canvasElement!.nativeElement.height = window.innerHeight;
+        const { cols, rows } = this.getDims();
+        this.world.resize(cols, rows);
+        this.draw();
     }
 }

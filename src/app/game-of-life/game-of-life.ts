@@ -1,13 +1,12 @@
 import { Coordinate } from './game-of-life.model';
+import { matrix, vector } from '../util/array';
 
 export class World {
     private cells: boolean[][];
     private _iterations = 0;
 
     constructor(cols: number, rows: number) {
-        this.cells = new Array(rows)
-            .fill(null)
-            .map((_) => new Array(cols).fill(false));
+        this.cells = matrix(rows, cols);
     }
 
     public get iterations(): number {
@@ -16,6 +15,41 @@ export class World {
 
     public get rows(): number {
         return this.cells.length;
+    }
+
+    public resize(cols: number, rows: number) {
+        const diffRows = Math.abs(this.rows - rows);
+        const diffRowsTop = Math.ceil(diffRows / 2);
+        const diffRowsBottom = Math.floor(diffRows / 2);
+
+        if (this.rows > rows) {
+            this.cells = this.cells.slice(
+                diffRowsTop,
+                this.rows - diffRowsBottom
+            );
+        } else if (this.rows < rows) {
+            this.cells = [
+                ...matrix(diffRowsTop, cols),
+                ...this.cells,
+                ...matrix(diffRowsBottom, cols),
+            ];
+        }
+
+        let diffCols = Math.abs(this.cols - cols);
+        const diffColsLeft = Math.ceil(diffCols / 2);
+        const diffColsRight = Math.floor(diffCols / 2);
+
+        if (this.cols > cols) {
+            this.cells = this.cells.map((row) =>
+                row.slice(diffColsLeft, this.cols - diffColsRight)
+            );
+        } else if (this.cols < cols) {
+            this.cells = this.cells.map((row) => [
+                ...vector(diffColsLeft),
+                ...row,
+                ...vector(diffColsRight),
+            ]);
+        }
     }
 
     public get cols(): number {
@@ -37,7 +71,7 @@ export class World {
         this.cells[cell.row][cell.col] = !this.cells[cell.row][cell.col];
     }
 
-    public draw(figure: string, center: Coordinate) {
+    public add(figure: string, center: Coordinate) {
         const rowData = figure.trim().split('\n');
         const rows = rowData.length;
         const cols = rowData[0].length;
