@@ -1,7 +1,12 @@
 export interface Coordinate {
-  col: number;
-  row: number;
+    col: number;
+    row: number;
 }
+export interface Dimensions {
+  cols: number;
+  rows: number;
+}
+
 
 export const cell = `X`;
 export const glider = `
@@ -30,8 +35,13 @@ X----X X----X
 --XXX---XXX--`;
 
 export const figures: { [key: string]: string } = {
-  cell,
-  glider,
-  block,
-  pulsar,
+    cell,
+    glider,
+    block,
+    pulsar,
 };
+
+export interface World {
+    cells: boolean[][];
+    iteration: number;
+}

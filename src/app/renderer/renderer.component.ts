@@ -1,48 +1,53 @@
-import { AfterViewInit, Component, ElementRef, NgZone, OnInit, ViewChild, } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    NgZone,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { debounceTime, Observable, tap } from 'rxjs';
+import { isAlive } from '../game/logic';
 import { runInZone } from '../util/run-in-zone';
 import { observeElementSize } from '../util/resize-observer';
-import { GameOfLifeService, isAlive } from './game-of-life.service';
+import { GameOfLifeService } from '../game/game-of-life.service';
 
 const aliveColor = '#fce114';
 const deadColor = '#a9a89f';
 
 @Component({
-    selector: 'app-game-of-life-render',
+    selector: 'app-game-renderer',
     template: ` <canvas (click)="onClick($event)" #canvasElement></canvas
-        ><span>Size:{{ size$ | async | json }}</span>`,
+        >`,
     styles: [
         `
             @import '../../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
             :host {
                 display: block;
                 height: 100%;
+              padding:10px;
             }
             canvas {
-                width: calc(100% - 100px);
-                height: calc(100% - 100px);
-                position: absolute;
+                width: 100%;
+                height: 100%;
                 background: #ccc;
-                top: 20px;
-                left: 20px;
-              border: 1px solid #666;
+                border: 1px solid #666;
                 z-index: 0;
             }
             span {
-              position: absolute;
-              top:30px;
-              left:300px;
+                position: absolute;
+                top: 30px;
+                left: 300px;
             }
         `,
     ],
 })
-export class GameOfLifeRenderComponent implements OnInit, AfterViewInit {
+export class RendererComponent implements OnInit, AfterViewInit {
     @ViewChild('canvasElement')
     canvasElement: ElementRef<HTMLCanvasElement> | undefined;
 
     context: CanvasRenderingContext2D | null | undefined;
 
-    size$?: Observable<any>;
     private _cellSize: number = 10;
 
     constructor(
@@ -52,14 +57,14 @@ export class GameOfLifeRenderComponent implements OnInit, AfterViewInit {
     ) {}
 
     ngOnInit() {
-        this.gameOfLife.evolution.subscribe((e) =>
+        this.gameOfLife.evolution$.subscribe((e) =>
             this.draw(e.cells, e.iteration)
         );
     }
 
     resize(observerEntry: ResizeObserverEntry) {
-        this.canvasElement!.nativeElement.width = window.innerWidth;
-        this.canvasElement!.nativeElement.height = window.innerHeight;
+        this.canvasElement!.nativeElement.width = observerEntry.contentRect.width;
+        this.canvasElement!.nativeElement.height = observerEntry.contentRect.height;
 
         this.gameOfLife.resize(
             Math.ceil(observerEntry.contentRect.height / this.cellSize),
@@ -77,11 +82,10 @@ export class GameOfLifeRenderComponent implements OnInit, AfterViewInit {
     }
 
     onClick($event: MouseEvent) {
-
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
         const col = Math.floor(($event.x - rect.x) / this.cellSize);
         const row = Math.floor(($event.y - rect.y) / this.cellSize);
-      console.log('click',{row,col});
+        console.log('click', { row, col });
         this.gameOfLife.toggle({ col, row });
     }
 
@@ -117,11 +121,11 @@ export class GameOfLifeRenderComponent implements OnInit, AfterViewInit {
     }
 
     private observeCanvas() {
-        this.size$ = observeElementSize(this.host.nativeElement).pipe(
+        observeElementSize(this.canvasElement!.nativeElement).pipe(
             debounceTime(100),
             runInZone(this.zone),
             tap((v) => this.resize(v[0]))
-        );
+        ).subscribe();
     }
 
     get cellSize(): number {
