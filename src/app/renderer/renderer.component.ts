@@ -17,15 +17,14 @@ const deadColor = '#a9a89f';
 
 @Component({
     selector: 'app-game-renderer',
-    template: ` <canvas (click)="onClick($event)" #canvasElement></canvas
-        >`,
+    template: ` <canvas (click)="onClick($event)" #canvasElement></canvas>`,
     styles: [
         `
             @import '../../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
             :host {
                 display: block;
                 height: 100%;
-              padding:10px;
+                padding: 10px;
             }
             canvas {
                 width: 100%;
@@ -63,8 +62,10 @@ export class RendererComponent implements OnInit, AfterViewInit {
     }
 
     resize(observerEntry: ResizeObserverEntry) {
-        this.canvasElement!.nativeElement.width = observerEntry.contentRect.width;
-        this.canvasElement!.nativeElement.height = observerEntry.contentRect.height;
+        this.canvasElement!.nativeElement.width =
+            observerEntry.contentRect.width;
+        this.canvasElement!.nativeElement.height =
+            observerEntry.contentRect.height;
 
         this.gameOfLife.resize(
             Math.ceil(observerEntry.contentRect.height / this.cellSize),
@@ -86,10 +87,11 @@ export class RendererComponent implements OnInit, AfterViewInit {
         const col = Math.floor(($event.x - rect.x) / this.cellSize);
         const row = Math.floor(($event.y - rect.y) / this.cellSize);
         console.log('click', { row, col });
-        this.gameOfLife.toggle({ col, row });
+        this.gameOfLife.paint({ col, row });
     }
 
     draw(cells: boolean[][], iteration: number) {
+        console.log('draw');
         if (!this.context) {
             return;
         }
@@ -121,11 +123,13 @@ export class RendererComponent implements OnInit, AfterViewInit {
     }
 
     private observeCanvas() {
-        observeElementSize(this.canvasElement!.nativeElement).pipe(
-            debounceTime(100),
-            runInZone(this.zone),
-            tap((v) => this.resize(v[0]))
-        ).subscribe();
+        observeElementSize(this.canvasElement!.nativeElement)
+            .pipe(
+                debounceTime(100),
+                runInZone(this.zone),
+                tap((v) => this.resize(v[0]))
+            )
+            .subscribe();
     }
 
     get cellSize(): number {
@@ -134,6 +138,5 @@ export class RendererComponent implements OnInit, AfterViewInit {
 
     set cellSize(value: number) {
         this._cellSize = value;
-        // this.fitWorld();
     }
 }

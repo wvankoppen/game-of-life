@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GameOfLifeService } from '../game/game-of-life.service';
-import { World } from '../model/game-of-life.model';
+import { figures, World } from '../model/game-of-life.model';
 
 @Component({
     selector: 'app-game-control',
@@ -53,16 +53,16 @@ import { World } from '../model/game-of-life.model';
             [(ngModel)]="gameOfLifeService.speed"
         ></mat-slider>
         Iterations: {{ evolution$ | async | iterations }}
-        <!--                <mat-form-field>-->
-        <!--                  <mat-select [(ngModel)]="nextFigure">-->
-        <!--                    <mat-option-->
-        <!--                      *ngFor="let figure of availableFigures"-->
-        <!--                      [value]="figure"-->
-        <!--                    >-->
-        <!--                      <pre>{{ figure }}</pre>-->
-        <!--                    </mat-option>-->
-        <!--                  </mat-select>-->
-        <!--                </mat-form-field>-->
+        <mat-form-field>
+            <mat-select [(ngModel)]="brush">
+                <mat-option
+                    *ngFor="let figure of availableFigures"
+                    [value]="figure"
+                >
+                    <pre>{{ figure }}</pre>
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
         Dimensions:
         <span *ngIf="evolution$ | async | dimensions as dims"
             >[{{ dims.rows }},{{ dims.cols }}]</span
@@ -80,13 +80,27 @@ export class ControlComponent implements OnInit {
     @Output()
     cellSize = new EventEmitter<number>();
 
+    availableFigures = Object.keys(figures);
+
+    private _brush: string = '';
+
+    constructor(public gameOfLifeService: GameOfLifeService) {}
+
+    get brush(): string {
+        return this._brush;
+    }
+    set brush(brushName: string) {
+        this._brush = brushName;
+        this.gameOfLifeService.brush = figures[brushName];
+    }
+
     get evolution$(): Observable<World> {
         return this.gameOfLifeService.evolution$;
     }
 
-    constructor(public gameOfLifeService: GameOfLifeService) {}
-
-    ngOnInit(): void {}
+    ngOnInit(): void {
+      this.brush = 'pulsar';
+    }
 
     onSizeChange($event: number | null) {
         this.cellSize.emit($event ?? this.sizeMax);

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { matrix, vector } from '../util/array';
-import { Coordinate, figures, World } from "../model/game-of-life.model";
-import { cols, contains, countNeighbors, rows } from "./logic";
-
+import { Coordinate, figures, World } from '../model/game-of-life.model';
+import { cols, contains, countNeighbors, rows } from './logic';
 
 @Injectable({
     providedIn: 'root',
@@ -15,13 +14,15 @@ export class GameOfLifeService {
     evolution$: Observable<World>;
     private _speed: number = 50;
 
+    brush?: string;
+
     constructor() {
         const init = { cells: matrix(0, 0), iteration: 0 };
         this._evolution = new BehaviorSubject(init);
         this.evolution$ = this._evolution.asObservable();
     }
 
-    public reset() {
+    reset() {
         const init = {
             cells: matrix(
                 rows(this._evolution.value.cells),
@@ -32,55 +33,46 @@ export class GameOfLifeService {
         this._evolution.next(init);
     }
 
-    public resize(newRows: number, newCols: number) {
+    resize(newRows: number, newCols: number) {
         console.log('resize', newRows, newCols);
-        const diffRows = Math.abs(rows(this._evolution.value.cells) - newRows);
+        let cells = this._evolution.value.cells;
+        const diffRows = Math.abs(rows(cells) - newRows);
         const diffRowsTop = Math.ceil(diffRows / 2);
         const diffRowsBottom = Math.floor(diffRows / 2);
 
-        if (rows(this._evolution.value.cells) > newRows) {
-            this._evolution.value.cells = this._evolution.value.cells.slice(
-                diffRowsTop,
-                rows(this._evolution.value.cells) - diffRowsBottom
-            );
-        } else if (rows(this._evolution.value.cells) < newRows) {
-            this._evolution.next({
-                cells: [
-                    ...matrix(diffRowsTop, newCols),
-                    ...this._evolution.value.cells,
-                    ...matrix(diffRowsBottom, newCols),
-                ],
-                iteration: this._evolution.value.iteration,
-            });
+        if (rows(cells) > newRows) {
+            cells = cells.slice(diffRowsTop, rows(cells) - diffRowsBottom);
+        } else if (rows(cells) < newRows) {
+            cells = [
+                ...matrix(diffRowsTop, newCols),
+                ...cells,
+                ...matrix(diffRowsBottom, newCols),
+            ];
         }
 
-        let diffCols = Math.abs(cols(this._evolution.value.cells) - newCols);
+        let diffCols = Math.abs(cols(cells) - newCols);
         const diffColsLeft = Math.ceil(diffCols / 2);
         const diffColsRight = Math.floor(diffCols / 2);
 
-        if (cols(this._evolution.value.cells) > newCols) {
-            this._evolution.next({
-                cells: this._evolution.value.cells.map((row) =>
-                    row.slice(
-                        diffColsLeft,
-                        cols(this._evolution.value.cells) - diffColsRight
-                    )
-                ),
-                iteration: this._evolution.value.iteration,
-            });
-        } else if (cols(this._evolution.value.cells) < newCols) {
-            this._evolution.next({
-                cells: this._evolution.value.cells.map((row) => [
-                    ...vector(diffColsLeft),
-                    ...row,
-                    ...vector(diffColsRight),
-                ]),
-                iteration: this._evolution.value.iteration++,
-            });
+        if (cols(cells) > newCols) {
+            cells = cells.map((row) =>
+                row.slice(diffColsLeft, cols(cells) - diffColsRight)
+            );
+        } else if (cols(cells) < newCols) {
+            cells = cells.map((row) => [
+                ...vector(diffColsLeft),
+                ...row,
+                ...vector(diffColsRight),
+            ]);
         }
+
+        this._evolution.next({
+            cells,
+            iteration: this._evolution.value.iteration,
+        });
     }
 
-    public toggle(cell: Coordinate) {
+    toggle(cell: Coordinate) {
         const cells = [...this._evolution.value.cells];
         cells[cell.row][cell.col] =
             !this._evolution.value.cells[cell.row][cell.col];
@@ -90,12 +82,12 @@ export class GameOfLifeService {
         });
     }
 
-    public setAlive(cell: Coordinate, state: boolean): boolean {
+    setAlive(cell: Coordinate, state: boolean): boolean {
         // TODO: Use subject.next
         return (this._evolution.value.cells[cell.row][cell.col] = state);
     }
 
-    public evolve() {
+    evolve() {
         let newWorld: boolean[][] = [];
         for (let row = 0; row < rows(this._evolution.value.cells); row++) {
             newWorld[row] = [];
@@ -137,8 +129,14 @@ export class GameOfLifeService {
         this.checkRestart();
     }
 
-    public add(figure: string, center: Coordinate) {
-        const rowData = figure.trim().split('\n');
+    paint(center: Coordinate) {
+        if (!this.brush) {
+            throw new Error('No brush set');
+        }
+
+        const cells = this._evolution.value.cells;
+
+        const rowData = figures[this.brush].trim().split('\n');
         const rows = rowData.length;
         const cols = rowData[0].length;
         const offsetCol = Math.round(cols / 2);
@@ -147,13 +145,15 @@ export class GameOfLifeService {
             for (let row = 0; row < rows; row++) {
                 const x = col + center.col - offsetCol;
                 const y = row + center.row - offsetRow;
-                if (contains({ col: x, row: y }, this._evolution.value.cells))
-                    this.setAlive(
-                        { col: x, row: y },
-                        rowData[row][col] === 'X'
-                    );
+                if (contains({ col: x, row: y }, cells))
+                    cells[y][x] = rowData[row][col] === 'X';
             }
         }
+
+        this._evolution.next({
+            cells,
+            iteration: this._evolution.value.iteration,
+        });
     }
 
     start() {
