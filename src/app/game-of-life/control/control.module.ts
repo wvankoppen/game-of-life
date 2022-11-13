@@ -7,14 +7,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { ControlComponent } from "./control.component";
 
 @NgModule({
-    declarations: [ControlComponent],
-    imports: [
-        CommonModule,
-        FormsModule,
-        MatSliderModule,
-        MatButtonModule,
-        MatSelectModule,
-    ],
+  declarations: [ControlComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatSliderModule,
+    MatButtonModule,
+    MatSelectModule,
+  ],
+  exports: [
+    ControlComponent
+  ]
 })
 export class ControlModule {
 

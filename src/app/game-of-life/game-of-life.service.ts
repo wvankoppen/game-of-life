@@ -22,48 +22,54 @@ export class GameOfLifeService {
         this.evolution = new BehaviorSubject(init);
     }
 
-    public get rows(): number {
-        return this.evolution.value.cells.length;
-    }
-
     public reset() {
-        const init = { cells: matrix(this.rows, this.cols), iteration: 0 };
+        const init = {
+            cells: matrix(
+                rows(this.evolution.value.cells),
+                cols(this.evolution.value.cells)
+            ),
+            iteration: 0,
+        };
         this.evolution = new BehaviorSubject(init);
     }
 
-    public resize(cols: number, rows: number) {
-        const diffRows = Math.abs(this.rows - rows);
+    public resize(newRows: number, newCols: number) {
+        console.log('resize', newRows, newCols);
+        const diffRows = Math.abs(rows(this.evolution.value.cells) - newRows);
         const diffRowsTop = Math.ceil(diffRows / 2);
         const diffRowsBottom = Math.floor(diffRows / 2);
 
-        if (this.rows > rows) {
+        if (rows(this.evolution.value.cells) > newRows) {
             this.evolution.value.cells = this.evolution.value.cells.slice(
                 diffRowsTop,
-                this.rows - diffRowsBottom
+                rows(this.evolution.value.cells) - diffRowsBottom
             );
-        } else if (this.rows < rows) {
+        } else if (rows(this.evolution.value.cells) < newRows) {
             this.evolution.next({
                 cells: [
-                    ...matrix(diffRowsTop, cols),
+                    ...matrix(diffRowsTop, newCols),
                     ...this.evolution.value.cells,
-                    ...matrix(diffRowsBottom, cols),
+                    ...matrix(diffRowsBottom, newCols),
                 ],
                 iteration: this.evolution.value.iteration,
             });
         }
 
-        let diffCols = Math.abs(this.cols - cols);
+        let diffCols = Math.abs(cols(this.evolution.value.cells) - newCols);
         const diffColsLeft = Math.ceil(diffCols / 2);
         const diffColsRight = Math.floor(diffCols / 2);
 
-        if (this.cols > cols) {
+        if (cols(this.evolution.value.cells) > newCols) {
             this.evolution.next({
                 cells: this.evolution.value.cells.map((row) =>
-                    row.slice(diffColsLeft, this.cols - diffColsRight)
+                    row.slice(
+                        diffColsLeft,
+                        cols(this.evolution.value.cells) - diffColsRight
+                    )
                 ),
                 iteration: this.evolution.value.iteration,
             });
-        } else if (this.cols < cols) {
+        } else if (cols(this.evolution.value.cells) < newCols) {
             this.evolution.next({
                 cells: this.evolution.value.cells.map((row) => [
                     ...vector(diffColsLeft),
@@ -75,27 +81,14 @@ export class GameOfLifeService {
         }
     }
 
-    public get cols(): number {
-        return this.evolution.value.cells[0].length;
-    }
-
-    public get hasLife(): boolean {
-        return this.livingCellCount > 0;
-    }
-
-    public get livingCellCount(): number {
-        return this.evolution.value.cells.reduce(
-            (acc, cur) => cur.filter((c) => c).length + acc,
-            0
-        );
-    }
-
     public toggle(cell: Coordinate) {
-        // this.evolution.next({cells: this.evolution.value.cells[cell.row][cell.col] = !this.evolution.value.cells[cell.row][cell.col]);
-    }
-
-    public isAlive(cell: Coordinate): boolean {
-        return this.evolution.value.cells[cell.row][cell.col];
+        const cells = [...this.evolution.value.cells];
+        cells[cell.row][cell.col] =
+            !this.evolution.value.cells[cell.row][cell.col];
+        this.evolution.next({
+            cells,
+            iteration: this.evolution.value.iteration,
+        });
     }
 
     public setAlive(cell: Coordinate, state: boolean): boolean {
@@ -103,19 +96,12 @@ export class GameOfLifeService {
         return (this.evolution.value.cells[cell.row][cell.col] = state);
     }
 
-    public contains(cell: Coordinate): boolean {
-        return (
-            this.evolution.value.cells[cell.row] !== undefined &&
-            this.evolution.value.cells[cell.row][cell.col] !== undefined
-        );
-    }
-
     public evolve() {
         let newWorld: boolean[][] = [];
-        for (let row = 0; row < this.rows; row++) {
+        for (let row = 0; row < rows(this.evolution.value.cells); row++) {
             newWorld[row] = [];
-            for (let col = 0; col < this.cols; col++) {
-                const neighbors = this.countNeighbors(
+            for (let col = 0; col < cols(this.evolution.value.cells); col++) {
+                const neighbors = countNeighbors(
                     { col, row },
                     this.evolution.value.cells
                 );
@@ -137,43 +123,6 @@ export class GameOfLifeService {
             cells: newWorld,
             iteration: this.evolution.value.iteration + 1,
         });
-    }
-
-    public countNeighbors(cell: Coordinate, cells: boolean[][]): number {
-        let neighborCount = 0;
-
-        if (cell.row > 0 && cells[cell.row - 1][cell.col]) neighborCount++;
-        if (
-            cell.row < this.rows - 1 &&
-            this.evolution.value.cells[cell.row + 1][cell.col]
-        )
-            neighborCount++;
-        if (cell.col < this.cols - 1 && cells[cell.row][cell.col + 1])
-            neighborCount++;
-        if (cell.col > 0 && cells[cell.row][cell.col - 1]) neighborCount++;
-
-        if (cell.row > 0 && cell.col > 0 && cells[cell.row - 1][cell.col - 1])
-            neighborCount++;
-        if (
-            cell.row > 0 &&
-            cell.col < this.cols - 1 &&
-            cells[cell.row - 1][cell.col + 1]
-        )
-            neighborCount++;
-        if (
-            cell.row < this.rows - 1 &&
-            cell.col > 0 &&
-            cells[cell.row + 1][cell.col - 1]
-        )
-            neighborCount++;
-        if (
-            cell.row < this.rows - 1 &&
-            cell.col < this.cols - 1 &&
-            cells[cell.row + 1][cell.col + 1]
-        )
-            neighborCount++;
-
-        return neighborCount;
     }
 
     get isStarted(): boolean {
@@ -199,7 +148,7 @@ export class GameOfLifeService {
             for (let row = 0; row < rows; row++) {
                 const x = col + center.col - offsetCol;
                 const y = row + center.row - offsetRow;
-                if (this.contains({ col: x, row: y }))
+                if (contains({ col: x, row: y }, this.evolution.value.cells))
                     this.setAlive(
                         { col: x, row: y },
                         rowData[row][col] === 'X'
@@ -233,4 +182,64 @@ export class GameOfLifeService {
     //     const rows = Math.ceil(window.innerHeight / this.evolution.valueize);
     //     return { rows, cols };
     // }
+}
+
+export function rows(cells: boolean[][]): number {
+    return cells.length;
+}
+
+export function cols(cells: boolean[][]): number {
+    return cells[0].length;
+}
+
+export function hasLife(cells: boolean[][]): boolean {
+    return livingCellCount(cells) > 0;
+}
+
+export function livingCellCount(cells: boolean[][]): number {
+    return cells.reduce((acc, cur) => cur.filter((c) => c).length + acc, 0);
+}
+
+export function isAlive(cell: Coordinate, cells: boolean[][]): boolean {
+    return cells[cell.row][cell.col];
+}
+
+export function contains(cell: Coordinate, cells: boolean[][]): boolean {
+    return (
+        cells[cell.row] !== undefined && cells[cell.row][cell.col] !== undefined
+    );
+}
+
+export function countNeighbors(cell: Coordinate, cells: boolean[][]): number {
+    let neighborCount = 0;
+
+    if (cell.row > 0 && cells[cell.row - 1][cell.col]) neighborCount++;
+    if (cell.row < rows(cells) - 1 && cells[cell.row + 1][cell.col])
+        neighborCount++;
+    if (cell.col < cols(cells) - 1 && cells[cell.row][cell.col + 1])
+        neighborCount++;
+    if (cell.col > 0 && cells[cell.row][cell.col - 1]) neighborCount++;
+
+    if (cell.row > 0 && cell.col > 0 && cells[cell.row - 1][cell.col - 1])
+        neighborCount++;
+    if (
+        cell.row > 0 &&
+        cell.col < cols(cells) - 1 &&
+        cells[cell.row - 1][cell.col + 1]
+    )
+        neighborCount++;
+    if (
+        cell.row < rows(cells) - 1 &&
+        cell.col > 0 &&
+        cells[cell.row + 1][cell.col - 1]
+    )
+        neighborCount++;
+    if (
+        cell.row < rows(cells) - 1 &&
+        cell.col < cols(cells) - 1 &&
+        cells[cell.row + 1][cell.col + 1]
+    )
+        neighborCount++;
+
+    return neighborCount;
 }

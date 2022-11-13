@@ -5,16 +5,17 @@ import { GameOfLifeService } from '../game-of-life.service';
     selector: 'app-control',
     template: `
       <div class="game-of-life__control">
-        <button mat-button *ngIf="gameOfLifeService.hasLife" (click)="gameOfLifeService.reset()">
-          Clear
-        </button>
+<!--        <button mat-button *ngIf="gameOfLifeService.hasLife" (click)="gameOfLifeService.reset()">-->
+<!--          Clear-->
+<!--        </button>-->
         <button
           mat-button
           (click)="gameOfLifeService.evolve()"
           color="primary"
-          [disabled]="gameOfLifeService.isStarted || !gameOfLifeService.hasLife"
+                  [disabled]="gameOfLifeService.isStarted"
         >
           Tick
+          <!--          [disabled]="gameOfLifeService.isStarted || !gameOfLifeService.hasLife"-->
         </button>
         <button mat-button (click)="gameOfLifeService.start()" *ngIf="!gameOfLifeService.isStarted">Start</button>
         <button mat-button (click)="gameOfLifeService.stop()" *ngIf="gameOfLifeService.isStarted">Stop</button>
@@ -44,7 +45,7 @@ import { GameOfLifeService } from '../game-of-life.service';
 <!--            </mat-option>-->
 <!--          </mat-select>-->
 <!--        </mat-form-field>-->
-        [{{ gameOfLifeService.rows }},{{ gameOfLifeService.cols }}],
+<!--        [{{ gameOfLifeService.rows }},{{ gameOfLifeService.cols }}],-->
       </div>`,
     styles: [
         `
@@ -61,7 +62,7 @@ export class ControlComponent implements OnInit {
   speedMax = 100;
   sizeMin = 5;
   sizeMax = 10;
-    constructor(private gameOfLifeService: GameOfLifeService) {
+    constructor(public gameOfLifeService: GameOfLifeService) {
 
     }
 
