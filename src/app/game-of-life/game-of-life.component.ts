@@ -1,68 +1,15 @@
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    NgZone,
-    OnInit,
-    ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, ViewChild, } from '@angular/core';
 import { debounceTime, Observable, tap } from 'rxjs';
 import { runInZone } from '../util/run-in-zone';
 import { observeElementSize } from '../util/resize-observer';
-import { World } from './game-of-life';
-import { figures } from './game-of-life.model';
+import { GameOfLifeService } from './game-of-life.service';
 
 const aliveColor = '#fce114';
 const deadColor = '#a9a89f';
 
 @Component({
     selector: 'app-game-of-life',
-    template: ` <div class="game-of-life__control">
-            <button mat-button *ngIf="world.hasLife" (click)="recreateWorld()">
-                Clear
-            </button>
-            <button
-                mat-button
-                (click)="tick()"
-                color="primary"
-                [disabled]="isStarted || !world.hasLife"
-            >
-                Tick
-            </button>
-            <button mat-button (click)="start()" *ngIf="!isStarted">
-                Start
-            </button>
-            <button mat-button (click)="stop()" *ngIf="isStarted">Stop</button>
-
-            Granularity:
-            <mat-slider
-                [min]="sizeMin"
-                [max]="sizeMax"
-                step="1"
-                [(ngModel)]="size"
-            ></mat-slider>
-            Speed:
-            <mat-slider
-                [min]="speedMin"
-                [max]="speedMax"
-                step="1"
-                [(ngModel)]="speed"
-            ></mat-slider>
-            Iterations: {{ world.iterations }}
-            <mat-form-field>
-                <mat-select [(ngModel)]="nextFigure">
-                    <mat-option
-                        *ngFor="let figure of availableFigures"
-                        [value]="figure"
-                    >
-                        <pre>{{ figure }}</pre>
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
-            {{ size$ | async | json }}
-            [{{ world.rows }},{{ world.cols }}],
-        </div>
-        <canvas (click)="onClick($event)" #canvasElement></canvas>`,
+    template: ` <canvas (click)="onClick($event)" #canvasElement></canvas>`,
     styles: [
         `
             @import '../../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
@@ -79,164 +26,94 @@ const deadColor = '#a9a89f';
                 left: 0;
                 z-index: 0;
             }
-            .game-of-life__control {
-                z-index: 1;
-                position: absolute;
-            }
         `,
     ],
 })
-export class GameOfLifeComponent implements OnInit, AfterViewInit {
+export class GameOfLifeComponent implements AfterViewInit {
     @ViewChild('canvasElement')
     canvasElement: ElementRef<HTMLCanvasElement> | undefined;
 
     context: CanvasRenderingContext2D | null | undefined;
-    world!: World;
-
-    speedMin = 1;
-    speedMax = 100;
-    sizeMin = 5;
-    sizeMax = 10;
-    private _size: number = 10;
-    private _speed: number = this.speedMax / 2;
-    private interval: any;
-
-    figures = figures;
-    availableFigures: string[] = Object.keys(figures);
-    nextFigure: string =
-        this.availableFigures[this.availableFigures.length - 1];
-
-    get isStarted(): boolean {
-        return !!this.interval;
-    }
-
-    get speed(): number {
-        return this._speed;
-    }
-
-    set speed(value: number) {
-        this._speed = value;
-        this.checkRestart();
-    }
-
-    get size(): number {
-        return this._size;
-    }
-
-    set size(value: number) {
-        this._size = value;
-        this.resize();
-    }
 
     size$?: Observable<any>;
+  private _cellSize: number = 10;
 
-    constructor(private host: ElementRef, private zone: NgZone) {}
+    constructor(
+        private host: ElementRef,
+        private zone: NgZone,
+        private gameOfLife: GameOfLifeService
+    ) {
+
+    }
 
     ngOnInit() {
-        this.size$ = observeElementSize(this.host.nativeElement).pipe(
-            debounceTime(100),
-            runInZone(this.zone),
-            tap((_x) => this.resize()),
-            tap(console.log)
-        );
+      this.gameOfLife.evolution.subscribe(e => this.draw(e.cells, e.iteration));
+    }
 
-        this.createWorld();
+    resize() {
+        this.canvasElement!.nativeElement.width = window.innerWidth;
+        this.canvasElement!.nativeElement.height = window.innerHeight;
     }
 
     ngAfterViewInit() {
         this.initCanvas();
-        this.draw();
+        this.observeCanvas();
     }
 
-    recreateWorld() {
-        this.stop();
-        this.createWorld();
-        this.initCanvas();
-        this.draw();
+    private initCanvas() {
+        this.context = this.canvasElement?.nativeElement.getContext('2d');
     }
 
     onClick($event: MouseEvent) {
-        const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
-        const col = Math.round(($event.x - rect.x) / this.size);
-        const row = Math.round(($event.y - rect.y) / this.size);
-
-        this.world.add(figures[this.nextFigure], { col, row });
-
-        this.draw();
+        // const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
+        // const col = Math.round(($event.x - rect.x) / this.gameOfLife.cellSize);
+        // const row = Math.round(($event.y - rect.y) / this.gameOfLife.cellSize);
+        //
+        // this.gameOfLife.click({ col, row });
     }
 
-    draw() {
+    draw(cells: boolean[][], iteration: number) {
         if (!this.context) {
             return;
         }
         this.context!.clearRect(
             0,
             0,
-            this.world.rows * this.size,
-            this.world.cols * this.size
+            cells.length * this.cellSize,
+            cells[0].length * this.cellSize
         );
-        for (let col = 0; col < this.world.cols; col++) {
-            for (let row = 0; row < this.world.rows; row++) {
-                this.context!.fillStyle = this.world.isAlive({
+        for (let col = 0; col < cells[0].length ; col++) {
+            for (let row = 0; row < cells.length ; row++) {
+                this.context!.fillStyle = this.gameOfLife.isAlive({
                     col,
                     row,
                 })
                     ? aliveColor
                     : deadColor;
                 this.context!.fillRect(
-                    col * this.size,
-                    row * this.size,
-                    this.size - 1,
-                    this.size - 1
+                    col * this.cellSize,
+                    row * this.cellSize,
+                    this.cellSize - 1,
+                    this.cellSize - 1
                 );
             }
         }
     }
 
-    start() {
-        this.interval = setInterval(() => this.tick(), 1000 / this.speed);
+    private observeCanvas() {
+        this.size$ = observeElementSize(this.host.nativeElement).pipe(
+            debounceTime(100),
+            runInZone(this.zone),
+            tap((_) => this.resize())
+        );
     }
 
-    stop() {
-        clearInterval(this.interval);
-        this.interval = null;
-    }
+  get cellSize(): number {
+    return this._cellSize;
+  }
 
-    tick() {
-        this.world.tick();
-        this.draw();
-    }
-
-    private checkRestart() {
-        if (this.isStarted) {
-            this.stop();
-            this.start();
-        }
-    }
-
-    private getDims() {
-        const cols = Math.ceil(window.innerWidth / this.size);
-        const rows = Math.ceil(window.innerHeight / this.size);
-        return { rows, cols };
-    }
-
-    private createWorld() {
-        const { cols, rows } = this.getDims();
-        this.world = new World(cols, rows);
-    }
-
-    private initCanvas() {
-        this.resize();
-        this.context = this.canvasElement?.nativeElement.getContext('2d');
-        this.canvasElement!.nativeElement.width = window.innerWidth;
-        this.canvasElement!.nativeElement.height = window.innerHeight;
-    }
-
-    private resize() {
-        this.canvasElement!.nativeElement.width = window.innerWidth;
-        this.canvasElement!.nativeElement.height = window.innerHeight;
-        const { cols, rows } = this.getDims();
-        this.world.resize(cols, rows);
-        this.draw();
-    }
+  set cellSize(value: number) {
+    this._cellSize = value;
+    // this.fitWorld();
+  }
 }

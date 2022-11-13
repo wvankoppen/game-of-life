@@ -26,7 +26,7 @@ describe('GameOfLife', () => {
         const center = { col: 1, row: 1 };
 
         world.toggle(center);
-        world.tick();
+        world.evolve();
 
         expect(world.livingCellCount).toBe(0);
     });
