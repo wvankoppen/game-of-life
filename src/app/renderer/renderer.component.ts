@@ -6,7 +6,7 @@ import {
     OnInit,
     ViewChild,
 } from '@angular/core';
-import { debounceTime, Observable, tap } from 'rxjs';
+import { debounceTime, tap } from 'rxjs';
 import { isAlive } from '../game/logic';
 import { runInZone } from '../util/run-in-zone';
 import { observeElementSize } from '../util/resize-observer';
@@ -14,6 +14,10 @@ import { GameOfLifeService } from '../game/game-of-life.service';
 
 const aliveColor = '#fce114';
 const deadColor = '#a9a89f';
+
+const aliveColor2 = '#fce1a4';
+const deadColor2 = '#afa8ff';
+
 
 @Component({
     selector: 'app-game-renderer',
@@ -57,7 +61,7 @@ export class RendererComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.gameOfLife.evolution$.subscribe((e) =>
-            this.draw(e.cells, e.iteration)
+            this.draw(e.cells)
         );
     }
 
@@ -90,7 +94,7 @@ export class RendererComponent implements OnInit, AfterViewInit {
         this.gameOfLife.paint({ col, row });
     }
 
-    draw(cells: boolean[][], iteration: number) {
+    draw(cells: boolean[][]) {
         console.log('draw');
         if (!this.context) {
             return;
@@ -103,15 +107,16 @@ export class RendererComponent implements OnInit, AfterViewInit {
         );
         for (let col = 0; col < cells[0].length; col++) {
             for (let row = 0; row < cells.length; row++) {
-                this.context!.fillStyle = isAlive(
-                    {
-                        col,
-                        row,
-                    },
-                    cells
-                )
-                    ? aliveColor
-                    : deadColor;
+              const targetColor = isAlive(
+                {
+                  col,
+                  row,
+                },
+                cells
+              )
+                ? col % 10 === 0||row % 10 === 0  ? aliveColor2: aliveColor
+                : col % 10 === 0||row % 10 === 0  ? deadColor2: deadColor;
+                this.context!.fillStyle = targetColor;
                 this.context!.fillRect(
                     col * this.cellSize,
                     row * this.cellSize,

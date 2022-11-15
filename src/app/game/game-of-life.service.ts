@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { matrix, vector } from '../util/array';
-import { Coordinate, figures, World } from '../model/game-of-life.model';
+import { Coordinate, World } from '../model/game-of-life.model';
 import { cols, contains, countNeighbors, rows } from './logic';
 
 @Injectable({
@@ -9,7 +9,6 @@ import { cols, contains, countNeighbors, rows } from './logic';
 })
 export class GameOfLifeService {
     private interval: any;
-    figures = figures;
     private _evolution: BehaviorSubject<World>;
     evolution$: Observable<World>;
     private _speed: number = 50;
@@ -72,21 +71,6 @@ export class GameOfLifeService {
         });
     }
 
-    toggle(cell: Coordinate) {
-        const cells = [...this._evolution.value.cells];
-        cells[cell.row][cell.col] =
-            !this._evolution.value.cells[cell.row][cell.col];
-        this._evolution.next({
-            cells,
-            iteration: this._evolution.value.iteration,
-        });
-    }
-
-    setAlive(cell: Coordinate, state: boolean): boolean {
-        // TODO: Use subject.next
-        return (this._evolution.value.cells[cell.row][cell.col] = state);
-    }
-
     evolve() {
         let newWorld: boolean[][] = [];
         for (let row = 0; row < rows(this._evolution.value.cells); row++) {
@@ -136,7 +120,7 @@ export class GameOfLifeService {
 
         const cells = this._evolution.value.cells;
 
-        const rowData = figures[this.brush].trim().split('\n');
+        const rowData = this.brush.trim().split('\n');
         const rows = rowData.length;
         const cols = rowData[0].length;
         const offsetCol = Math.round(cols / 2);
@@ -157,16 +141,16 @@ export class GameOfLifeService {
     }
 
     start() {
-        this.interval = setInterval(() => this.tick(), 1000 / this.speed);
+        const interval = Math.round(2000 / this.speed);
+        if (this.interval) {
+            throw new Error('First clear existing interval!');
+        }
+        this.interval = setInterval(() => this.evolve(), interval);
     }
 
     stop() {
         clearInterval(this.interval);
         this.interval = null;
-    }
-
-    tick() {
-        this.evolve();
     }
 
     private checkRestart() {
@@ -175,10 +159,4 @@ export class GameOfLifeService {
             this.start();
         }
     }
-    //
-    // private getDims() {
-    //     const cols = Math.ceil(window.innerWidth / this._evolution.valueize);
-    //     const rows = Math.ceil(window.innerHeight / this._evolution.valueize);
-    //     return { rows, cols };
-    // }
 }
