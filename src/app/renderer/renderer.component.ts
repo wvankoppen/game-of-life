@@ -77,9 +77,9 @@ export class RendererComponent implements OnInit, AfterViewInit {
     }
 
     resize() {
-      if (!this.canvasElement?.nativeElement) {
-        return;
-      }
+        if (!this.canvasElement?.nativeElement) {
+            return;
+        }
         this.gameOfLife.resize(
             Math.ceil(this.canvasElement!.nativeElement.height / this.cellSize),
             Math.ceil(this.canvasElement!.nativeElement.width / this.cellSize)
@@ -111,8 +111,8 @@ export class RendererComponent implements OnInit, AfterViewInit {
         this.context!.clearRect(
             0,
             0,
-          this.canvasElement!.nativeElement.width ,
-          this.canvasElement!.nativeElement.height
+            this.canvasElement!.nativeElement.width,
+            this.canvasElement!.nativeElement.height
         );
         for (let col = 0; col < cells[0].length; col++) {
             for (let row = 0; row < cells.length; row++) {

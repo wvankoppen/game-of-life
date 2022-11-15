@@ -70,7 +70,7 @@ import { figures, World } from '../model/game-of-life.model';
             <i class="material-icons">redo</i>
             {{ evolution$ | async | iterations }}
             <button (click)="draw()" title="Paint" mat-button>
-              <i class="material-icons">format_paint</i>
+                <i class="material-icons">format_paint</i>
             </button>
         </div>
 

@@ -16,8 +16,8 @@ import { Component, OnInit } from '@angular/core';
             }
 
             header h1 {
-              font-size: 18pt;
-              text-decoration: underline;
+                font-size: 18pt;
+                text-decoration: underline;
             }
         `,
     ],

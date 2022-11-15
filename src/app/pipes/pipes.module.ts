@@ -6,8 +6,13 @@ import { DimensionsPipe } from './dimensions.pipe';
 import { LivingCellCountPipe } from './living-cell-count.pipe';
 
 @NgModule({
-    declarations: [HasLifePipe, IterationsPipe, DimensionsPipe, LivingCellCountPipe],
+    declarations: [
+        HasLifePipe,
+        IterationsPipe,
+        DimensionsPipe,
+        LivingCellCountPipe,
+    ],
     imports: [CommonModule],
-  exports: [HasLifePipe, IterationsPipe, DimensionsPipe, LivingCellCountPipe],
+    exports: [HasLifePipe, IterationsPipe, DimensionsPipe, LivingCellCountPipe],
 })
 export class PipesModule {}

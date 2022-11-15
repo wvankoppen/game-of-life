@@ -3,10 +3,9 @@ export interface Coordinate {
     row: number;
 }
 export interface Dimensions {
-  cols: number;
-  rows: number;
+    cols: number;
+    rows: number;
 }
-
 
 export const cell = `X`;
 export const glider = `

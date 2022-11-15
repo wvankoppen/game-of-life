@@ -1,6 +1,6 @@
 import { MockBuilder, MockRender } from 'ng-mocks';
-import { RendererModule } from "./renderer.module";
-import { RendererComponent } from "./renderer.component";
+import { RendererModule } from './renderer.module';
+import { RendererComponent } from './renderer.component';
 
 describe('RendererComponent', () => {
     let component: RendererComponent;
