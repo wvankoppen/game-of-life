@@ -28,7 +28,6 @@ const deadColor2 = '#afa8ff';
             :host {
                 display: block;
                 height: 100%;
-                padding: 10px;
             }
             canvas {
                 width: 100%;

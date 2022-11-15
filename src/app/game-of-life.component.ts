@@ -2,10 +2,13 @@ import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-game-of-life',
-    template: ` <app-game-control
-            (cellSize)="onCellSizeChange($event)"
+    template: `
+      <app-title></app-title>
+        <app-game-renderer></app-game-renderer>
+        <app-game-control
+          (cellSize)="onCellSizeChange($event)"
         ></app-game-control>
-        <app-game-renderer></app-game-renderer>`,
+    `,
     styles: [
         `
             :host {
