@@ -2,6 +2,7 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
+    Input,
     NgZone,
     OnInit,
     ViewChild,
@@ -17,7 +18,6 @@ const deadColor = '#a9a89f';
 
 const aliveColor2 = '#fce1a4';
 const deadColor2 = '#afa8ff';
-
 
 @Component({
     selector: 'app-game-renderer',
@@ -49,8 +49,14 @@ export class RendererComponent implements OnInit, AfterViewInit {
     canvasElement: ElementRef<HTMLCanvasElement> | undefined;
 
     context: CanvasRenderingContext2D | null | undefined;
-
     private _cellSize: number = 10;
+    get cellSize(): number {
+        return this._cellSize;
+    }
+    @Input() set cellSize(s: number) {
+        this._cellSize = s;
+        this.resize();
+    }
 
     constructor(
         private host: ElementRef,
@@ -59,20 +65,24 @@ export class RendererComponent implements OnInit, AfterViewInit {
     ) {}
 
     ngOnInit() {
-        this.gameOfLife.evolution$.subscribe((e) =>
-            this.draw(e.cells)
-        );
+        this.gameOfLife.evolution$.subscribe((e) => this.draw(e.cells));
     }
 
-    resize(observerEntry: ResizeObserverEntry) {
+    onCanvasChangeSize(observerEntry: ResizeObserverEntry) {
         this.canvasElement!.nativeElement.width =
             observerEntry.contentRect.width;
         this.canvasElement!.nativeElement.height =
             observerEntry.contentRect.height;
+        this.resize();
+    }
 
+    resize() {
+      if (!this.canvasElement?.nativeElement) {
+        return;
+      }
         this.gameOfLife.resize(
-            Math.ceil(observerEntry.contentRect.height / this.cellSize),
-            Math.ceil(observerEntry.contentRect.width / this.cellSize)
+            Math.ceil(this.canvasElement!.nativeElement.height / this.cellSize),
+            Math.ceil(this.canvasElement!.nativeElement.width / this.cellSize)
         );
     }
 
@@ -101,20 +111,24 @@ export class RendererComponent implements OnInit, AfterViewInit {
         this.context!.clearRect(
             0,
             0,
-            cells.length * this.cellSize,
-            cells[0].length * this.cellSize
+          this.canvasElement!.nativeElement.width ,
+          this.canvasElement!.nativeElement.height
         );
         for (let col = 0; col < cells[0].length; col++) {
             for (let row = 0; row < cells.length; row++) {
-              const targetColor = isAlive(
-                {
-                  col,
-                  row,
-                },
-                cells
-              )
-                ? col % 10 === 0||row % 10 === 0  ? aliveColor2: aliveColor
-                : col % 10 === 0||row % 10 === 0  ? deadColor2: deadColor;
+                const targetColor = isAlive(
+                    {
+                        col,
+                        row,
+                    },
+                    cells
+                )
+                    ? col % 10 === 0 || row % 10 === 0
+                        ? aliveColor2
+                        : aliveColor
+                    : col % 10 === 0 || row % 10 === 0
+                    ? deadColor2
+                    : deadColor;
                 this.context!.fillStyle = targetColor;
                 this.context!.fillRect(
                     col * this.cellSize,
@@ -131,16 +145,8 @@ export class RendererComponent implements OnInit, AfterViewInit {
             .pipe(
                 debounceTime(100),
                 runInZone(this.zone),
-                tap((v) => this.resize(v[0]))
+                tap((v) => this.onCanvasChangeSize(v[0]))
             )
             .subscribe();
-    }
-
-    get cellSize(): number {
-        return this._cellSize;
-    }
-
-    set cellSize(value: number) {
-        this._cellSize = value;
     }
 }

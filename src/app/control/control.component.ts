@@ -50,7 +50,9 @@ import { figures, World } from '../model/game-of-life.model';
             <mat-slider
                 [min]="sizeMin"
                 [max]="sizeMax"
+                thumbLabel
                 step="1"
+                value="10"
                 (valueChange)="onSizeChange($event)"
             ></mat-slider>
 
