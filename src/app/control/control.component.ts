@@ -105,7 +105,7 @@ import { figures, World } from '../model/game-of-life.model';
             }
 
             .stats dl {
-                margin: 0px;
+                margin: 0;
             }
         `,
     ],
