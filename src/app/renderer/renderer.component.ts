@@ -49,7 +49,7 @@ export class RendererComponent implements OnInit, AfterViewInit {
     canvasElement: ElementRef<HTMLCanvasElement> | undefined;
 
     context: CanvasRenderingContext2D | null | undefined;
-    private _cellSize: number = 20;
+
     get cellSize(): number {
         return this._cellSize;
     }
@@ -57,6 +57,7 @@ export class RendererComponent implements OnInit, AfterViewInit {
         this._cellSize = size;
         this.resize();
     }
+    private _cellSize: number = 20;
 
     constructor(
         private host: ElementRef,
@@ -91,15 +92,10 @@ export class RendererComponent implements OnInit, AfterViewInit {
         this.observeCanvas();
     }
 
-    private initCanvas() {
-        this.context = this.canvasElement?.nativeElement.getContext('2d');
-    }
-
     onClick($event: MouseEvent) {
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
         const col = Math.floor(($event.x - rect.x) / this.cellSize);
         const row = Math.floor(($event.y - rect.y) / this.cellSize);
-        console.log('click', { row, col });
         this.gameOfLife.paint({ col, row });
     }
 
@@ -137,6 +133,10 @@ export class RendererComponent implements OnInit, AfterViewInit {
                 );
             }
         }
+    }
+
+    private initCanvas() {
+        this.context = this.canvasElement?.nativeElement.getContext('2d');
     }
 
     private observeCanvas() {

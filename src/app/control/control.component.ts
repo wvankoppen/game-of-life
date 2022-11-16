@@ -14,7 +14,7 @@ import { figures, World } from '../model/game-of-life.model';
             (click)="gameOfLifeService.start()"
             *ngIf="!gameOfLifeService.isStarted"
         >
-            <i class="material-icons">play_arrow</i> play
+            <i class="material-icons">play_arrow</i> run
         </button>
         <button
             mat-button
@@ -23,18 +23,6 @@ import { figures, World } from '../model/game-of-life.model';
             *ngIf="gameOfLifeService.isStarted"
         >
             <i class="material-icons">stop</i> stop
-        </button>
-        <button
-            mat-button
-            title="Clear"
-            [disabled]="!(evolution$ | async | hasLife)"
-            (click)="gameOfLifeService.reset()"
-        >
-            <i class="material-icons">clear</i>clear
-        </button>
-
-        <button (click)="draw()" title="Paint" mat-button>
-            <i class="material-icons">format_paint</i> draw
         </button>
 
         <button
@@ -48,7 +36,20 @@ import { figures, World } from '../model/game-of-life.model';
             <i class="material-icons">redo</i> tick
         </button>
 
-        <i class="material-icons controlLegend">photo_size_select_small</i>cell size
+        <button
+            mat-button
+            title="Clear"
+            [disabled]="!(evolution$ | async | hasLife)"
+            (click)="gameOfLifeService.reset()"
+        >
+            <i class="material-icons">clear</i>clear
+        </button>
+
+        <button (click)="draw()" title="Paint" mat-button>
+            <i class="material-icons">format_paint</i> draw
+        </button>
+
+        <i class="material-icons">photo_size_select_small</i>cell size
         <mat-slider
             [min]="sizeMin"
             [max]="sizeMax"
@@ -58,7 +59,7 @@ import { figures, World } from '../model/game-of-life.model';
             (valueChange)="onSizeChange($event)"
         ></mat-slider>
 
-        <i class="material-icons controlLegend">speed</i>speed
+        <i class="material-icons">speed</i>speed
         <mat-slider
             [min]="speedMin"
             [max]="speedMax"
@@ -80,11 +81,10 @@ import { figures, World } from '../model/game-of-life.model';
                 align-items: center;
             }
 
-            .controlLegend {
-              margin-left:50px;
-              padding: 5px;
+            i:not(:first-child) {
+              margin: 0 5px 0 30px;
+              padding: 0;
             }
-
         `,
     ],
 })
@@ -102,8 +102,8 @@ export class ControlComponent implements OnInit {
         public dialog: MatDialog
     ) {}
 
-    set brush(brushName: string) {
-        this.gameOfLifeService.brush = figures[brushName];
+    set paintBrush(brushName: string) {
+        this.gameOfLifeService.paintBrush = figures[brushName];
     }
 
     get evolution$(): Observable<World> {
@@ -111,7 +111,7 @@ export class ControlComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.brush = 'cell';
+        this.paintBrush = 'cell';
     }
 
     onSizeChange($event: number | null) {

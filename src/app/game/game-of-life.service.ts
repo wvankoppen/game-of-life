@@ -8,12 +8,12 @@ import { cols, contains, countNeighbors, rows } from './logic';
     providedIn: 'root',
 })
 export class GameOfLifeService {
+    evolution$: Observable<World>;
+    paintBrush?: string;
+
     private interval: any;
     private _evolution: BehaviorSubject<World>;
-    evolution$: Observable<World>;
     private _speed: number = 50;
-
-    brush?: string;
 
     constructor() {
         const init = { cells: matrix(0, 0), iteration: 0 };
@@ -114,13 +114,13 @@ export class GameOfLifeService {
     }
 
     paint(center: Coordinate) {
-        if (!this.brush) {
-            throw new Error('No brush set');
+        if (!this.paintBrush) {
+            throw new Error('No paint brush set');
         }
 
         const cells = this._evolution.value.cells;
 
-        const rowData = this.brush.trim().split('\n');
+        const rowData = this.paintBrush.trim().split('\n');
         const rows = rowData.length;
         const cols = rowData[0].length;
         const offsetCol = Math.floor(cols / 2);
@@ -143,7 +143,7 @@ export class GameOfLifeService {
     start() {
         const interval = Math.round(2000 / this.speed);
         if (this.interval) {
-            throw new Error('First clear existing interval!');
+            throw new Error('First clear existing interval handler!');
         }
         this.interval = setInterval(() => this.evolve(), interval);
     }

@@ -17,13 +17,14 @@ import { figures } from '../model/game-of-life.model';
 })
 export class DialogComponent {
     figureTypes = Object.keys(figures);
+
     constructor(
         private gameOfLifeService: GameOfLifeService,
         private dialogRef: DialogRef
     ) {}
 
     draw(figureType: string) {
-        this.gameOfLifeService.brush = figures[figureType];
+        this.gameOfLifeService.paintBrush = figures[figureType];
         this.dialogRef.close();
     }
 }

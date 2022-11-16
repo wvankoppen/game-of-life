@@ -12,13 +12,16 @@ import { Component } from '@angular/core';
             header {
                 position: fixed;
                 left: 50%;
+                top: 20px;
                 transform: translate(-50%, 0);
-                font-family: Courier;
-                color: #666;
             }
 
             header h1 {
                 font-size: 18pt;
+                font-family: Courier;
+                margin: 0;
+                padding: 0;
+              color: #666;
             }
         `,
     ],
