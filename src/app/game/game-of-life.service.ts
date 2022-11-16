@@ -123,8 +123,8 @@ export class GameOfLifeService {
         const rowData = this.brush.trim().split('\n');
         const rows = rowData.length;
         const cols = rowData[0].length;
-        const offsetCol = Math.round(cols / 2);
-        const offsetRow = Math.round(rows / 2);
+        const offsetCol = Math.floor(cols / 2);
+        const offsetRow = Math.floor(rows / 2);
         for (let col = 0; col < cols; col++) {
             for (let row = 0; row < rows; row++) {
                 const x = col + center.col - offsetCol;

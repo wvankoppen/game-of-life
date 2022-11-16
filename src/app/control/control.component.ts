@@ -111,7 +111,7 @@ export class ControlComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.brush = 'pulsar';
+        this.brush = 'cell';
     }
 
     onSizeChange($event: number | null) {

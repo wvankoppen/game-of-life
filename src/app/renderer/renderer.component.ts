@@ -27,6 +27,7 @@ const deadColor2 = '#b6b6b6';
             :host {
                 display: block;
                 height: 100%;
+                cursor: pointer;
             }
             canvas {
                 width: 100%;
@@ -115,7 +116,7 @@ export class RendererComponent implements OnInit, AfterViewInit {
         );
         for (let col = 0; col < cells[0].length; col++) {
             for (let row = 0; row < cells.length; row++) {
-              this.context!.fillStyle = isAlive(
+                this.context!.fillStyle = isAlive(
                     {
                         col,
                         row,
