@@ -8,6 +8,8 @@ import { Component } from '@angular/core';
             :host {
                 display: block;
                 height: 100%;
+                margin: 0;
+                padding: 0;
             }
         `,
     ],

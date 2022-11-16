@@ -13,18 +13,17 @@ import { runInZone } from '../util/run-in-zone';
 import { observeElementSize } from '../util/resize-observer';
 import { GameOfLifeService } from '../game/game-of-life.service';
 
-const aliveColor = '#fce114';
-const deadColor = '#a9a89f';
+const aliveColor = '#69f0ae';
+const deadColor = '#aaaaaa';
 
-const aliveColor2 = '#fce1a4';
-const deadColor2 = '#afa8ff';
+const aliveColor2 = '#6cf3af';
+const deadColor2 = '#b6b6b6';
 
 @Component({
     selector: 'app-game-renderer',
     template: ` <canvas (click)="onClick($event)" #canvasElement></canvas>`,
     styles: [
         `
-            @import '../../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
             :host {
                 display: block;
                 height: 100%;
@@ -32,7 +31,7 @@ const deadColor2 = '#afa8ff';
             canvas {
                 width: 100%;
                 height: 100%;
-                background: #ccc;
+                background: #999;
                 border: 1px solid #666;
                 z-index: 0;
             }
@@ -49,12 +48,12 @@ export class RendererComponent implements OnInit, AfterViewInit {
     canvasElement: ElementRef<HTMLCanvasElement> | undefined;
 
     context: CanvasRenderingContext2D | null | undefined;
-    private _cellSize: number = 10;
+    private _cellSize: number = 20;
     get cellSize(): number {
         return this._cellSize;
     }
-    @Input() set cellSize(s: number) {
-        this._cellSize = s;
+    @Input() set cellSize(size: number) {
+        this._cellSize = size;
         this.resize();
     }
 
@@ -116,7 +115,7 @@ export class RendererComponent implements OnInit, AfterViewInit {
         );
         for (let col = 0; col < cells[0].length; col++) {
             for (let row = 0; row < cells.length; row++) {
-                const targetColor = isAlive(
+              this.context!.fillStyle = isAlive(
                     {
                         col,
                         row,
@@ -129,7 +128,6 @@ export class RendererComponent implements OnInit, AfterViewInit {
                     : col % 10 === 0 || row % 10 === 0
                     ? deadColor2
                     : deadColor;
-                this.context!.fillStyle = targetColor;
                 this.context!.fillRect(
                     col * this.cellSize,
                     row * this.cellSize,

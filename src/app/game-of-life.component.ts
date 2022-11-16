@@ -8,23 +8,21 @@ import { Component } from '@angular/core';
         <app-game-control
             (cellSize)="onCellSizeChange($event)"
         ></app-game-control>
+        <app-game-stats></app-game-stats>
     `,
     styles: [
         `
             :host {
                 display: block;
                 height: 100%;
-            }
-
-            app-game-control {
-                position: absolute;
-                bottom: 0;
+                margin: 0;
+                padding: 0;
             }
         `,
     ],
 })
 export class GameOfLifeComponent {
-    cellSize = 10;
+    cellSize = 20;
 
     onCellSizeChange($event: number) {
         this.cellSize = $event;
