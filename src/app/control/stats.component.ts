@@ -7,7 +7,7 @@ import { World } from '../model/game-of-life.model';
     selector: 'app-game-stats',
     template: `
             <dl>
-                <dt>Dimensions:</dt>
+                <dt>Dimensions</dt>
                 <dd *ngIf="evolution$ | async | dimensions as dims">
                     {{ dims.rows }} x {{ dims.cols }}
                 </dd>
