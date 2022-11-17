@@ -1,7 +1,8 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { Component, Host, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { DialogComponent } from '../dialog/dialog.component';
+import { GameOfLifeComponent } from '../game-of-life.component';
 import { GameOfLifeService } from '../game/game-of-life.service';
 import { figures, World } from '../model/game-of-life.model';
 
@@ -11,6 +12,7 @@ import { figures, World } from '../model/game-of-life.model';
         <button
             mat-button
             title="start"
+            color="primary"
             (click)="gameOfLifeService.start()"
             *ngIf="!gameOfLifeService.isStarted"
         >
@@ -50,23 +52,14 @@ import { figures, World } from '../model/game-of-life.model';
         </button>
 
         <i class="material-icons">photo_size_select_small</i>cell size
-        <mat-slider
-            [min]="sizeMin"
-            [max]="sizeMax"
-            thumbLabel
-            step="1"
-            value="20"
-            (valueChange)="onSizeChange($event)"
-        ></mat-slider>
+        <mat-slider [min]="sizeMin" [max]="sizeMax" discrete step="1">
+            <input matSliderThumb [(ngModel)]="parent.cellSize" />
+        </mat-slider>
 
         <i class="material-icons">speed</i>speed
-        <mat-slider
-            [min]="speedMin"
-            [max]="speedMax"
-            thumbLabel
-            step="1"
-            [(ngModel)]="gameOfLifeService.speed"
-        ></mat-slider>
+        <mat-slider [min]="speedMin" [max]="speedMax" discrete step="1">
+            <input matSliderThumb [(ngModel)]="gameOfLifeService.speed" />
+        </mat-slider>
     `,
     styles: [
         `
@@ -82,8 +75,8 @@ import { figures, World } from '../model/game-of-life.model';
             }
 
             i:not(:first-child) {
-              margin: 0 5px 0 30px;
-              padding: 0;
+                margin: 0 5px 0 30px;
+                padding: 0;
             }
         `,
     ],
@@ -94,12 +87,10 @@ export class ControlComponent implements OnInit {
     sizeMin = 5;
     sizeMax = 20;
 
-    @Output()
-    cellSize = new EventEmitter<number>();
-
     constructor(
         public gameOfLifeService: GameOfLifeService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        @Host() public parent: GameOfLifeComponent
     ) {}
 
     set paintBrush(brushName: string) {
@@ -112,10 +103,6 @@ export class ControlComponent implements OnInit {
 
     ngOnInit(): void {
         this.paintBrush = 'cell';
-    }
-
-    onSizeChange($event: number | null) {
-        this.cellSize.emit($event ?? this.sizeMax);
     }
 
     draw() {

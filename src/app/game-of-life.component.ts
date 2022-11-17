@@ -5,9 +5,7 @@ import { Component } from '@angular/core';
     template: `
         <app-title></app-title>
         <app-game-renderer [cellSize]="cellSize"></app-game-renderer>
-        <app-game-control
-            (cellSize)="onCellSizeChange($event)"
-        ></app-game-control>
+        <app-game-control></app-game-control>
         <app-game-stats></app-game-stats>
     `,
     styles: [
@@ -23,9 +21,4 @@ import { Component } from '@angular/core';
 })
 export class GameOfLifeComponent {
     cellSize = 20;
-
-    onCellSizeChange($event: number) {
-        this.cellSize = $event;
-        console.log('onCellSizeChange', $event);
-    }
 }
