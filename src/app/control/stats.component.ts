@@ -17,6 +17,9 @@ import { World } from '../model/game-of-life.model';
 
                 <dt>Iterations</dt>
                 <dd>{{ evolution$ | async | iterations }}</dd>
+
+                <dt>FPS</dt>
+                <dd>{{ gameOfLifeService.isRunning ? (gameOfLifeService.frameRate | number:'1.1-1') : '-' }}</dd>
             </dl>
     `,
     styles: [

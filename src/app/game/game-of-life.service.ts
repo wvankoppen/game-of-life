@@ -11,14 +11,25 @@ export class GameOfLifeService {
     evolution$: Observable<World>;
     paintBrush?: string;
 
-    private interval: any;
+    frameRate?: number;
     private _evolution: BehaviorSubject<World>;
-    private _speed: number = 50;
+    speed: number = 50;
+    private _isRunning = false;
 
     constructor() {
         const init = { cells: matrix(0, 0), iteration: 0 };
         this._evolution = new BehaviorSubject(init);
         this.evolution$ = this._evolution.asObservable();
+    }
+
+    get isRunning(): boolean {
+        return this._isRunning;
+    }
+    set isRunning(value: boolean) {
+        this._isRunning = value;
+        if (this._isRunning) {
+            this.run();
+        }
     }
 
     reset() {
@@ -100,19 +111,6 @@ export class GameOfLifeService {
         });
     }
 
-    get isStarted(): boolean {
-        return !!this.interval;
-    }
-
-    get speed(): number {
-        return this._speed;
-    }
-
-    set speed(value: number) {
-        this._speed = value;
-        this.checkRestart();
-    }
-
     paint(center: Coordinate) {
         if (!this.paintBrush) {
             throw new Error('No paint brush set');
@@ -140,23 +138,17 @@ export class GameOfLifeService {
         });
     }
 
-    start() {
-        const interval = Math.round(2000 / this.speed);
-        if (this.interval) {
-            throw new Error('First clear existing interval handler!');
-        }
-        this.interval = setInterval(() => this.evolve(), interval);
-    }
-
-    stop() {
-        clearInterval(this.interval);
-        this.interval = null;
-    }
-
-    private checkRestart() {
-        if (this.isStarted) {
-            this.stop();
-            this.start();
-        }
+    run() {
+        let prevTimestamp: number;
+        const step = (timestamp: number) => {
+            this.frameRate = 1000 / (timestamp - prevTimestamp);
+            prevTimestamp = timestamp;
+            this.evolve();
+            if (this.isRunning) {
+              //TODO: Use setTimeout to wire speed config
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
     }
 }

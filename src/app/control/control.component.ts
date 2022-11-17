@@ -9,30 +9,21 @@ import { figures, World } from '../model/game-of-life.model';
 @Component({
     selector: 'app-game-control',
     template: `
-        <button
-            mat-button
-            title="start"
-            color="primary"
-            (click)="gameOfLifeService.start()"
-            *ngIf="!gameOfLifeService.isStarted"
-        >
-            <i class="material-icons">play_arrow</i> run
-        </button>
-        <button
-            mat-button
-            title="stop"
-            (click)="gameOfLifeService.stop()"
-            *ngIf="gameOfLifeService.isStarted"
-        >
-            <i class="material-icons">stop</i> stop
-        </button>
+        <mat-checkbox
+            title="Active"
+            (change)="
+                gameOfLifeService.isRunning = !gameOfLifeService.isRunning
+            "
+            [checked]="gameOfLifeService.isRunning"
+        >Active
+        </mat-checkbox>
 
         <button
             mat-button
             (click)="gameOfLifeService.evolve()"
             title="Tick"
             [disabled]="
-                gameOfLifeService.isStarted || !(evolution$ | async | hasLife)
+                gameOfLifeService.isRunning || !(evolution$ | async | hasLife)
             "
         >
             <i class="material-icons">redo</i> tick
@@ -78,13 +69,17 @@ import { figures, World } from '../model/game-of-life.model';
                 margin: 0 5px 0 30px;
                 padding: 0;
             }
+
+            mat-slider {
+              margin: 0 20px 0;
+            }
         `,
     ],
 })
 export class ControlComponent implements OnInit {
     speedMin = 1;
     speedMax = 100;
-    sizeMin = 5;
+    sizeMin = 2;
     sizeMax = 20;
 
     constructor(
