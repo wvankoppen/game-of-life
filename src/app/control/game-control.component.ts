@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { WhatToDrawDialogComponent } from "../dialog/what-to-draw-dialog.component";
+import { WhatToDrawDialogComponent } from '../dialog/what-to-draw-dialog.component';
 import { GameOfLifeService } from '../game/game-of-life.service';
 import { figures, World } from '../model/game-of-life.model';
 
@@ -57,8 +57,6 @@ import { figures, World } from '../model/game-of-life.model';
                 color: #333 !important;
             }
 
-
-
             i:not(:first-child) {
                 margin: 0 5px 0 30px;
                 padding: 0;
@@ -83,8 +81,7 @@ export class GameControlComponent implements OnInit {
 
     constructor(
         public gameOfLifeService: GameOfLifeService,
-        public dialog: MatDialog,
-        // @Host() public parent: GameOfLifeComponent
+        public dialog: MatDialog
     ) {}
 
     set paintBrush(brushName: string) {
@@ -95,7 +92,7 @@ export class GameControlComponent implements OnInit {
         return this.gameOfLifeService.evolution$;
     }
 
-    ngOnInit(): void {
+    ngOnInit() {
         this.paintBrush = 'cell';
     }
 

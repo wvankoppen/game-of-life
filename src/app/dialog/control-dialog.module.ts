@@ -6,12 +6,8 @@ import { ControlDialogComponent } from './control-dialog.component';
 
 @NgModule({
     declarations: [ControlDialogComponent],
-    imports: [
-        CommonModule,
-        MatDialogModule,
-        GameControlModule,
-    ],
+    imports: [CommonModule, MatDialogModule, GameControlModule],
 })
 export class ControlDialogModule {
-  static bootstrap = ControlDialogComponent;
+    static bootstrap = ControlDialogComponent;
 }

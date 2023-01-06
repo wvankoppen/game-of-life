@@ -4,7 +4,6 @@ Implementation according to John Conways [Game of Life](https://en.wikipedia.org
 
 It uses Angular and Angular Material.
 
-
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to http://localhost:4200. The app will automatically reload if you change any of the source files.
