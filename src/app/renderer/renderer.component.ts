@@ -2,7 +2,6 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    Input,
     NgZone,
     OnInit,
     ViewChild,
@@ -50,15 +49,6 @@ export class RendererComponent implements OnInit, AfterViewInit {
 
     context: CanvasRenderingContext2D | null | undefined;
 
-    get cellSize(): number {
-        return this._cellSize;
-    }
-    @Input() set cellSize(size: number) {
-        this._cellSize = size;
-        this.resize();
-    }
-    private _cellSize: number = 20;
-
     constructor(
         private host: ElementRef,
         private zone: NgZone,
@@ -82,8 +72,8 @@ export class RendererComponent implements OnInit, AfterViewInit {
             return;
         }
         this.gameOfLife.resize(
-            Math.ceil(this.canvasElement!.nativeElement.height / this.cellSize),
-            Math.ceil(this.canvasElement!.nativeElement.width / this.cellSize)
+            Math.ceil(this.canvasElement!.nativeElement.height / this.gameOfLife.cellSize),
+            Math.ceil(this.canvasElement!.nativeElement.width / this.gameOfLife.cellSize)
         );
     }
 
@@ -94,8 +84,8 @@ export class RendererComponent implements OnInit, AfterViewInit {
 
     onClick($event: MouseEvent) {
         const rect = this.canvasElement!.nativeElement.getBoundingClientRect();
-        const col = Math.floor(($event.x - rect.x) / this.cellSize);
-        const row = Math.floor(($event.y - rect.y) / this.cellSize);
+        const col = Math.floor(($event.x - rect.x) / this.gameOfLife.cellSize);
+        const row = Math.floor(($event.y - rect.y) / this.gameOfLife.cellSize);
         this.gameOfLife.paint({ col, row });
     }
 
@@ -126,10 +116,10 @@ export class RendererComponent implements OnInit, AfterViewInit {
                     ? deadColor2
                     : deadColor;
                 this.context!.fillRect(
-                    col * this.cellSize,
-                    row * this.cellSize,
-                    this.cellSize - 1,
-                    this.cellSize - 1
+                    col * this.gameOfLife.cellSize,
+                    row * this.gameOfLife.cellSize,
+                    this.gameOfLife.cellSize - 1,
+                    this.gameOfLife.cellSize - 1
                 );
             }
         }

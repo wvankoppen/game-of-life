@@ -1,8 +1,7 @@
-import { Component, Host, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { WhatToDrawDialogComponent } from "../dialog/what-to-draw-dialog.component";
-import { GameOfLifeComponent } from '../game-of-life.component';
 import { GameOfLifeService } from '../game/game-of-life.service';
 import { figures, World } from '../model/game-of-life.model';
 
@@ -44,7 +43,7 @@ import { figures, World } from '../model/game-of-life.model';
 
         <i class="material-icons">photo_size_select_small</i>cell size
         <mat-slider [min]="sizeMin" [max]="sizeMax" discrete step="1">
-            <input matSliderThumb [(ngModel)]="parent.cellSize" />
+            <input matSliderThumb [(ngModel)]="gameOfLifeService.cellSize" />
         </mat-slider>
 
         <i class="material-icons">speed</i>speed
@@ -58,16 +57,7 @@ import { figures, World } from '../model/game-of-life.model';
                 color: #333 !important;
             }
 
-            :host {
-                opacity: 0.5;
-                border: 1px solid #000;
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                background: #ccc;
-                display: inline-flex;
-                align-items: center;
-            }
+
 
             i:not(:first-child) {
                 margin: 0 5px 0 30px;
@@ -94,7 +84,7 @@ export class GameControlComponent implements OnInit {
     constructor(
         public gameOfLifeService: GameOfLifeService,
         public dialog: MatDialog,
-        @Host() public parent: GameOfLifeComponent
+        // @Host() public parent: GameOfLifeComponent
     ) {}
 
     set paintBrush(brushName: string) {

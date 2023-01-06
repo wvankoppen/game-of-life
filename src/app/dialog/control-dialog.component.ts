@@ -8,6 +8,6 @@ import { Component } from '@angular/core';
             <app-game-control></app-game-control>
         </div>
     `,
-    styles: [``],
+    styles: [],
 })
 export class ControlDialogComponent {}

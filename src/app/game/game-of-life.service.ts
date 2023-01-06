@@ -14,6 +14,7 @@ export class GameOfLifeService {
     frameRate?: number;
     private _evolution: BehaviorSubject<World>;
     speed: number = 50;
+    cellSize: number = 20;
     private _isRunning = false;
 
     constructor() {
