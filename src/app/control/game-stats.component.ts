@@ -24,23 +24,33 @@ import { World } from '../model/game-of-life.model';
     `,
     styles: [
         `
-            :host {
-                opacity: 0.5;
-                padding: 10px;
-                border: 1px solid #000;
-                position: fixed;
-                right: 20px;
-                top: 20px;
-                background: #ccc;
-            }
+          :host {
+            opacity: 0.5;
+            padding: 10px;
+            border: 1px solid #000;
+            position: fixed;
+            background: #ccc;
+          }
 
+          @media (min-width: 480px) {
+              :host {
+                  right: 20px;
+                  top: 20px;
+              }
+          }
+          @media (max-width: 480px) {
+              :host {
+                  right: 20px;
+                  top: 70px;
+              }
+          }
              dl {
                 margin: 0;
             }
         `,
     ],
 })
-export class StatsComponent {
+export class GameStatsComponent {
     constructor(
         public gameOfLifeService: GameOfLifeService,
     ) {}

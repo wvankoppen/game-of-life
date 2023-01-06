@@ -14,6 +14,7 @@ import { Component } from '@angular/core';
                 left: 50%;
                 top: 20px;
                 transform: translate(-50%, 0);
+                min-width: 210px;
             }
 
             header h1 {
@@ -21,7 +22,7 @@ import { Component } from '@angular/core';
                 font-family: Courier;
                 margin: 0;
                 padding: 0;
-              color: #666;
+                color: #666;
             }
         `,
     ],

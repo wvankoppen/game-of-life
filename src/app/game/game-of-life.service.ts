@@ -145,8 +145,11 @@ export class GameOfLifeService {
             prevTimestamp = timestamp;
             this.evolve();
             if (this.isRunning) {
-              //TODO: Use setTimeout to wire speed config
-                window.requestAnimationFrame(step);
+                const timeout = 2000 / this.speed;
+                window.setTimeout(
+                    () => window.requestAnimationFrame(step),
+                    timeout
+                );
             }
         };
         window.requestAnimationFrame(step);

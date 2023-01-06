@@ -4,18 +4,21 @@ import { GameOfLifeService } from '../game/game-of-life.service';
 import { figures } from '../model/game-of-life.model';
 
 @Component({
-    selector: 'app-dialog',
+    selector: 'app-what-to-draw-dialog',
     template: `
-        <button
-            (click)="draw(figureType)"
-            *ngFor="let figureType of figureTypes"
-        >
-            {{ figureType }}
-        </button>
+        <h1 mat-dialog-title>Choose what to draw</h1>
+        <div mat-dialog-content>
+            <button
+                (click)="draw(figureType)"
+                *ngFor="let figureType of figureTypes"
+            >
+                {{ figureType }}
+            </button>
+        </div>
     `,
     styles: [``],
 })
-export class DialogComponent {
+export class WhatToDrawDialogComponent {
     figureTypes = Object.keys(figures);
 
     constructor(

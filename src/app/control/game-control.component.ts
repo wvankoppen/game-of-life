@@ -1,7 +1,7 @@
 import { Component, Host, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { DialogComponent } from '../dialog/dialog.component';
+import { WhatToDrawDialogComponent } from "../dialog/what-to-draw-dialog.component";
 import { GameOfLifeComponent } from '../game-of-life.component';
 import { GameOfLifeService } from '../game/game-of-life.service';
 import { figures, World } from '../model/game-of-life.model';
@@ -9,14 +9,14 @@ import { figures, World } from '../model/game-of-life.model';
 @Component({
     selector: 'app-game-control',
     template: `
-        <mat-checkbox
-            title="Active"
+        <mat-slide-toggle
+            title="active"
             (change)="
                 gameOfLifeService.isRunning = !gameOfLifeService.isRunning
             "
             [checked]="gameOfLifeService.isRunning"
-        >Active
-        </mat-checkbox>
+            ><span>active</span>
+        </mat-slide-toggle>
 
         <button
             mat-button
@@ -54,6 +54,10 @@ import { figures, World } from '../model/game-of-life.model';
     `,
     styles: [
         `
+            * {
+                color: #333 !important;
+            }
+
             :host {
                 opacity: 0.5;
                 border: 1px solid #000;
@@ -70,13 +74,18 @@ import { figures, World } from '../model/game-of-life.model';
                 padding: 0;
             }
 
-            mat-slider {
-              margin: 0 20px 0;
+            mat-slider,
+            mat-slide-toggle {
+                margin: 0 20px 0;
+            }
+
+            span {
+                color: black;
             }
         `,
     ],
 })
-export class ControlComponent implements OnInit {
+export class GameControlComponent implements OnInit {
     speedMin = 1;
     speedMax = 100;
     sizeMin = 2;
@@ -101,6 +110,6 @@ export class ControlComponent implements OnInit {
     }
 
     draw() {
-        this.dialog.open(DialogComponent);
+        this.dialog.open(WhatToDrawDialogComponent);
     }
 }
