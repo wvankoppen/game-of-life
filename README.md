@@ -7,7 +7,6 @@ It uses Angular and Angular Material.
 TODO: 
 - chore: Add integration tests
 - chore: Add unit tests
-- refactor: ng16
 - fix: adapt board size on changing cell size
 - feat: choose border behavior
 
