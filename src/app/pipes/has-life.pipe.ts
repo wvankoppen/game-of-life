@@ -4,6 +4,7 @@ import { World } from '../model/game-of-life.model';
 
 @Pipe({
     name: 'hasLife',
+  standalone: true
 })
 export class HasLifePipe implements PipeTransform {
     transform(world: World | null): boolean {

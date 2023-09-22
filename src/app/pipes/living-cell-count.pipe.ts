@@ -4,6 +4,7 @@ import { World } from '../model/game-of-life.model';
 
 @Pipe({
     name: 'livingCellCount',
+  standalone: true
 })
 export class LivingCellCountPipe implements PipeTransform {
     transform(world: World | null): number {

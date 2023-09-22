@@ -4,6 +4,7 @@ import { Dimensions, World } from '../model/game-of-life.model';
 
 @Pipe({
     name: 'dimensions',
+  standalone: true
 })
 export class DimensionsPipe implements PipeTransform {
     transform(world: World | null): Dimensions {

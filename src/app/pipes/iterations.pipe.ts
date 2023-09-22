@@ -3,6 +3,7 @@ import { World } from '../model/game-of-life.model';
 
 @Pipe({
     name: 'iterations',
+  standalone: true
 })
 export class IterationsPipe implements PipeTransform {
     transform(world: World | null): number {

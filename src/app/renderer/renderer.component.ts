@@ -21,6 +21,7 @@ const deadColor2 = '#b6b6b6';
 @Component({
     selector: 'app-game-renderer',
     template: ` <canvas (click)="onClick($event)" #canvasElement></canvas>`,
+    standalone: true,
     styles: [
         `
             :host {

@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
             <h1>[Game of Life]</h1>
         </header>
     `,
+    standalone: true,
     styles: [
         `
             header {

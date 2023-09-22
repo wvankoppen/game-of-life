@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
-const controlDialogModule = import('./dialog/control-dialog.module').then(
+const controlDialogModule = import('../dialog/control-dialog.module').then(
     (m) => m.ControlDialogModule
 );
 

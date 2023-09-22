@@ -1,20 +1,19 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { GameControlModule } from '../control/game-control.module';
-import { GameOfLifeComponent } from '../game-of-life.component';
-import { RendererModule } from '../renderer/renderer.module';
 import { TitleComponent } from '../title/title.component';
+import {GameOfLifeComponent} from "./game-of-life.component";
+import {RendererComponent} from "../renderer/renderer.component";
 
 @NgModule({
-    declarations: [GameOfLifeComponent, TitleComponent],
+    declarations: [GameOfLifeComponent],
     imports: [
-        CommonModule,
         GameControlModule,
-        RendererModule,
+        RendererComponent,
         MatButtonModule,
         MatIconModule,
+        TitleComponent,
     ],
     exports: [GameOfLifeComponent],
 })
