@@ -5,8 +5,11 @@ Implementation according to John Conways [Game of Life](https://en.wikipedia.org
 It uses Angular and Angular Material.
 
 TODO: 
-- Add integration tests
-- Fix change cell size 
+- chore: Add integration tests
+- chore: Add unit tests
+- refactor: ng16
+- fix: adapt board size on changing cell size
+- feat: choose border behavior
 
 ## Development server
 
