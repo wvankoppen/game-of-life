@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 
 describe('AppComponent', () => {
     let component: AppComponent;
+
     beforeEach(() => MockBuilder(AppComponent, AppModule));
 
     beforeEach(() => {

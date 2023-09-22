@@ -1,20 +1,21 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
-const cdm = import('./dialog/control-dialog.module').then(
+const controlDialogModule = import('./dialog/control-dialog.module').then(
     (m) => m.ControlDialogModule
 );
 
 @Component({
     selector: 'app-game-of-life',
     template: `
-        <app-title></app-title>
+        <app-title />
 
-        <app-game-renderer></app-game-renderer>
+        <app-game-renderer />
 
-        <app-game-control></app-game-control>
+        <app-game-control />
+        <app-game-control />
 
-        <app-game-stats></app-game-stats>
+        <app-game-stats />
 
         <button (click)="openPopup()" mat-mini-fab color="primary">
             <mat-icon>menu</mat-icon>
@@ -62,6 +63,6 @@ export class GameOfLifeComponent {
     constructor(public dialog: MatDialog) {}
 
     async openPopup() {
-        this.dialog.open((await cdm).bootstrap);
+        this.dialog.open((await controlDialogModule).bootstrap);
     }
 }

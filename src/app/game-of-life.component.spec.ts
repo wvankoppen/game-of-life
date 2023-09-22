@@ -1,19 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GameOfLifeComponent } from './game-of-life.component';
+import { MockBuilder, MockRender } from 'ng-mocks';
+import {MatDialog} from "@angular/material/dialog";
 
 describe('GameOfLifeComponent', () => {
     let component: GameOfLifeComponent;
-    let fixture: ComponentFixture<GameOfLifeComponent>;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [GameOfLifeComponent],
-        }).compileComponents();
+    beforeEach(() => MockBuilder(GameOfLifeComponent ));
 
-        fixture = TestBed.createComponent(GameOfLifeComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+    beforeAll(() => {
+        component = MockRender(GameOfLifeComponent).point.componentInstance;
     });
 
     it('should create', () => {
